@@ -8,8 +8,8 @@
         :root { --primary: #1677ff; --primary-hover: #4096ff; --primary-bg: #e6f4ff; --success: #52c41a; --success-bg: #f6ffed; --success-border: #b7eb8f; --warning: #fa8c16; --warning-bg: #fff7e6; --warning-border: #ffd591; --danger: #ff4d4f; --danger-bg: #fff2f0; --danger-border: #ffccc7; --border: #e8e8e8; --border-light: #f0f0f0; --bg: #f5f7fa; --bg-white: #ffffff; --text: #1f1f1f; --text-secondary: #595959; --text-muted: #8c8c8c; --header-bg: #001529; --table-header: #fafafa; --table-hover: #f5f8ff; --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-lg: 0 4px 20px rgba(0,0,0,0.12); --radius: 6px; --radius-sm: 4px; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
-        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
-        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .app-header { height: 48px; background: linear-gradient(135deg, #4285f4, #667eea); border-bottom: none; display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 1px; padding: 0; border-radius: 0; background: transparent; text-shadow: none; }
         .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
         .tab-bar::-webkit-scrollbar { height: 0; }
         .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
@@ -55,6 +55,7 @@
         .btn-add { background: var(--primary); border-color: var(--primary); color: white; }
         .btn-add:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
         .btn-delete { background: var(--bg-white); border-color: var(--border); color: var(--text-secondary); }
+        .btn-danger { background: var(--danger); border-color: var(--danger); color: white; }
         .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
         .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
         .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
@@ -116,7 +117,7 @@
         <div class="tab-bar"></div>
     </header>
     <div class="page-container">
-        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">C3 责任方配置</span></span>                <div class="toolbar-actions">                    <button class="btn btn-sm btn-link" onclick="doAdd()">新增</button>                    <button class="btn btn-sm btn-link" onclick="doDelete()">删除</button>                    <button class="btn btn-sm btn-link" onclick="exportData()">导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label">零部件类别</span><select id="q_componentCategory"><option value="">全部</option><option>电子元器件</option><option>结构件</option><option>紧固件</option><option>包装材料</option><option>化学品</option></select>
+        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">C3 责任方配置</span></span>                <div class="toolbar-actions">                    <button class="btn btn-sm btn-primary" onclick="doAdd()">新增</button>                    <button class="btn btn-sm btn-danger" onclick="doDelete()">删除</button>                    <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label">零部件类别</span><select id="q_componentCategory"><option value="">全部</option><option>电子元器件</option><option>结构件</option><option>紧固件</option><option>包装材料</option><option>化学品</option></select>
             </div>                <div class="query-item"><span class="query-label">组件类别</span><select id="q_componentType"><option value="">全部</option><option>IC类</option><option>阻容类</option><option>连接器</option><option>PCB板</option><option>结构件</option></select></div>                <div class="query-item"><span class="query-label">组件责任人</span><input type="text" id="q_componentResponsibleParty" placeholder="输入责任人名称"></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="table-container">
             <div class="table-wrapper">
                 <div class="table-scroll">
@@ -191,7 +192,7 @@
         </div>
     </div>
 
-    <script>
+    <script src="../../src/js/tab-manager.js"></script><script>
         // C3屏幕字段定义（按照SPEC.md）
         var tableFields = [
             {field: 'componentCategory', name: '零部件类别', width: 140, queryable: true, queryType: 'SEL_2', editable: true, editableType: 'select'},
@@ -539,6 +540,7 @@
         // 初始化
         generateMockData();
         renderTable();
+TabManager.init();
     </script>
 </body>
 </html>

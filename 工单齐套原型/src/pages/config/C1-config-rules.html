@@ -19,8 +19,8 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
-        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
-        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .app-header { height: 48px; background: linear-gradient(135deg, #4285f4, #667eea); border-bottom: none; display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 1px; padding: 0; border-radius: 0; background: transparent; text-shadow: none; }
         .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
         .tab-bar::-webkit-scrollbar { height: 0; }
         .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
@@ -67,6 +67,7 @@
         .btn-add { background: var(--primary); border-color: var(--primary); color: white; }
         .btn-add:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
         .btn-delete { background: var(--bg-white); border-color: var(--border); color: var(--text-secondary); }
+        .btn-danger { background: var(--danger); border-color: var(--danger); color: white; }
         .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
         .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
         .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
@@ -145,18 +146,18 @@
     <div class="page-container">
         <div class="unified-toolbar">
             <div class="toolbar-row">
-                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">C1 齐套规则配置</span></span>
+                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">C1 齐套规则配置</span></span>
                 <div class="toolbar-actions">
-                    <button class="btn btn-sm btn-link" onclick="doAdd()">➕ 新增</button>
-                    <button class="btn btn-sm btn-link" onclick="doDelete()">🗑 删除</button>
-                    <button class="btn btn-sm btn-link" onclick="exportData()">📥 导出</button>
+                    <button class="btn btn-sm btn-primary" onclick="doAdd()">新增</button>
+                    <button class="btn btn-sm btn-danger" onclick="doDelete()">删除</button>
+                    <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
                 </div>
             </div>
             <div class="toolbar-query">
                 <div class="query-item"><span class="query-label">配置编码</span><input type="text" id="qCode" placeholder="多条件逗号分隔"></div>
                 <div class="query-item"><span class="query-label">组织</span><select id="qOrg"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
-                <button class="btn btn-primary btn-sm" onclick="doSearch()">🔍 查询</button>
-                <button class="btn btn-sm" onclick="resetQuery()">↺ 重置</button>
+                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>
+                <button class="btn btn-sm" onclick="resetQuery()">重置</button>
             </div>
         </div>
         <div class="stat-bar">
@@ -190,7 +191,7 @@
         <div class="drawer-body">
             <div class="sub-query">
                 <div class="query-item"><span class="query-label">组织</span><select id="c1_1Org"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
-                <button class="btn btn-primary btn-sm" onclick="filterC1_1Data()">🔍 查询</button>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_1Data()">查询</button>
             </div>
             <div class="check-bar">
                 <label><input type="checkbox" id="c1_1SelectAll" onchange="toggleAllC1_1(this)"> 全选</label>
@@ -220,7 +221,7 @@
         <div class="drawer-body">
             <div class="sub-query">
                 <div class="query-item"><span class="query-label">组织</span><select id="c1_2Org"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
-                <button class="btn btn-primary btn-sm" onclick="filterC1_2Data()">🔍 查询</button>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_2Data()">查询</button>
             </div>
             <div class="check-bar">
                 <label><input type="checkbox" id="c1_2SelectAll" onchange="toggleAllC1_2(this)"> 全选</label>
@@ -249,7 +250,7 @@
         <div class="drawer-body">
             <div class="sub-query">
                 <div class="query-item"><span class="query-label" style="color:var(--danger)">组织 *</span><select id="c1_3Org"><option value="">请选择</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
-                <button class="btn btn-primary btn-sm" onclick="filterC1_3Data()">🔍 查询</button>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_3Data()">查询</button>
             </div>
             <div class="check-bar">
                 <label><input type="checkbox" id="c1_3SelectAll" onchange="toggleAllC1_3(this)"> 全选</label>
@@ -278,7 +279,7 @@
         <div class="drawer-body">
             <div class="sub-query">
                 <div class="query-item"><span class="query-label" style="color:var(--danger)">组织 *</span><select id="c1_4Org"><option value=""></option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
-                <button class="btn btn-primary btn-sm" onclick="filterC1_4Data()">🔍 查询</button>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_4Data()">查询</button>
             </div>
             <div class="check-bar">
                 <label><input type="checkbox" id="c1_4SelectAll" onchange="toggleAllC1_4(this)"> 全选</label>
@@ -306,7 +307,7 @@
         <div class="drawer-header"><h3>📋 C1_5 工单状态配置</h3><button class="modal-close" onclick="closeDrawer('c1_5')">×</button></div>
         <div class="drawer-body">
             <div class="sub-query">
-                <button class="btn btn-primary btn-sm" onclick="filterC1_5Data()">🔍 查询</button>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_5Data()">查询</button>
             </div>
             <div class="check-bar">
                 <label><input type="checkbox" id="c1_5SelectAll" onchange="toggleAllC1_5(this)"> 全选</label>
@@ -339,7 +340,7 @@
                 <div class="query-item"><span class="query-label">组织</span><select id="c1_3_1Org"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
                 <div class="query-item"><span class="query-label">仓位编码</span><input type="text" id="c1_3_1Code" placeholder="输入仓位编码"></div>
                 <div class="query-item"><span class="query-label">仓位说明</span><input type="text" id="c1_3_1Name" placeholder="输入仓位说明"></div>
-                <button class="btn btn-primary btn-sm" onclick="filterC1_3_1Data()">🔍 查询</button>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_3_1Data()">查询</button>
             </div>
             <div class="check-bar">
                 <label><input type="checkbox" id="c1_3_1SelectAll" onchange="toggleAllC1_3_1(this)"> 全选</label>
@@ -362,7 +363,7 @@
         </div>
     </div>
 
-    <script>
+    <script src="../../src/js/tab-manager.js"></script><script>
         // 表格字段定义 - 已移除"是否有效"字段
         var tableFields = [
             {field: 'seqNo', name: '序号', visible: true, width: 60},
@@ -571,7 +572,7 @@
 
                 html += '<td class="col-right-sticky">';
                 html += '<a class="link" onclick="saveRow(' + i + ')">💾 保存</a> | ';
-                html += '<a class="link" onclick="deleteRow(' + i + ')">🗑 删除</a>';
+                html += '<a class="link" onclick="deleteRow(' + i + ')">删除</a>';
                 html += '</td></tr>';
             }
 
@@ -1195,6 +1196,7 @@
         generateMockData();
         renderTable();
         initDraggableModal('c1_3_1Modal', 'c1_3_1Header');
+TabManager.init();
     </script>
 </body>
 </html>

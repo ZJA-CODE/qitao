@@ -19,8 +19,8 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
-        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
-        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .app-header { height: 48px; background: linear-gradient(135deg, #4285f4, #667eea); border-bottom: none; display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 1px; padding: 0; border-radius: 0; background: transparent; text-shadow: none; }
         .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
         .tab-bar::-webkit-scrollbar { height: 0; }
         .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
@@ -169,7 +169,7 @@
         <div class="tab-bar"></div>
     </header>
     <div class="page-container">
-        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">M3 物料缺料汇总</span></span>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label required">配置编码</span><select id="q_configCode"><option value="">请选择</option><option>CFG-2025-00001</option><option>CFG-2025-00002</option><option>CFG-2025-00003</option></select>
+        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">M3 物料缺料汇总</span></span>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label required">配置编码</span><select id="q_configCode"><option value="">请选择</option><option>CFG-2025-00001</option><option>CFG-2025-00002</option><option>CFG-2025-00003</option></select>
             </div>                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>                <div class="query-item"><span class="query-label">组件物料</span><input type="text" id="q_componentMaterialCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">组件责任方</span><input type="text" id="q_componentResponsibleParty" placeholder="多条件逗号分隔"></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="stat-cards">
             <button class="stat-btn stat-full" id="statFull" onclick="filterByKit('full')"><span class="stat-value" id="statFullVal">0</span><span>齐套</span></button>
             <button class="stat-btn stat-empty" id="statEmpty" onclick="filterByKit('empty')"><span class="stat-value" id="statEmptyVal">0</span><span>不齐套</span></button>
@@ -223,7 +223,7 @@
         <div class="drawer-footer"><button class="btn btn-sm" onclick="closeDrawer()">关闭</button></div>
     </div>
 
-    <script>
+    <script src="../../src/js/tab-manager.js"></script><script>
         // SPEC.md 屏幕12: M3 工单齐套-物料详细 - 22个字段（无操作列）
         var fieldDefs = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},
@@ -626,6 +626,7 @@
         }
 
         init();
+TabManager.init();
     </script>
 </body>
 </html>
