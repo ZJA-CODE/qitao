@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C1 齐套规则计算配置表</title>
+    <style>
+        :root {
+            --primary: #1677ff; --primary-hover: #4096ff; --primary-bg: #e6f4ff;
+            --success: #52c41a; --success-bg: #f6ffed; --success-border: #b7eb8f;
+            --warning: #fa8c16; --warning-bg: #fff7e6; --warning-border: #ffd591;
+            --danger: #ff4d4f; --danger-bg: #fff2f0; --danger-border: #ffccc7;
+            --border: #e8e8e8; --border-light: #f0f0f0;
+            --bg: #f5f7fa; --bg-white: #ffffff;
+            --text: #1f1f1f; --text-secondary: #595959; --text-muted: #8c8c8c;
+            --header-bg: #001529; --table-header: #fafafa; --table-hover: #f5f8ff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+            --radius: 6px; --radius-sm: 4px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
+        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
+        .tab-bar::-webkit-scrollbar { height: 0; }
+        .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
+        .tab-item:hover { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
+        .tab-item.active { background: #4285f4; color: #fff; border-color: #4285f4; }
+        .tab-close { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; opacity: 0.6; transition: all 0.15s; }
+        .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+        .tab-item.active .tab-close { opacity: 0.8; }
+        .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
+        .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
+        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
+        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+        .breadcrumb-bar a:hover { text-decoration: underline; }
+        .breadcrumb-sep { color: var(--text-muted); }
+        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
+        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
+        .toolbar-breadcrumb a:hover { text-decoration: underline; }
+        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
+        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
+        .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
+        .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+        .toolbar-query .query-item input,
+        .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
+        .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+        .toolbar-query .query-label.required::after { content: " *"; color: var(--danger); }
+        .query-bar { padding: 12px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; flex-shrink: 0; }
+        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .query-item input, .query-item select { height: 30px; min-width: 120px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
+        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .query-label { color: var(--text-secondary); white-space: nowrap; }
+        .stat-bar { padding: 8px 20px; background: var(--warning-bg); border-bottom: 1px solid var(--warning-border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: #ad6800; }
+        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+        .btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-add { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-add:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-delete { background: var(--bg-white); border-color: var(--border); color: var(--text-secondary); }
+        .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+        .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
+        .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
+        .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+        .table-scroll { flex: 1; min-height: 0; overflow: auto; }
+        .data-table { font-size: 13px; border-collapse: separate; border-spacing: 0; width: 100%; min-width: max-content; }
+        .data-table th, .data-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; white-space: nowrap; }
+        .data-table thead th { position: sticky; top: 0; z-index: 11; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--table-header); font-size: 12px; }
+        .data-table tbody tr:hover td { background: var(--table-hover); }
+        .col-check { width: 40px; text-align: center; position: sticky; left: 0; z-index: 6; background: var(--table-header); }
+        .data-table thead th.col-check { z-index: 14; }
+        .col-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .col-right-sticky { position: sticky; right: 0; z-index: 7; background: var(--bg-white); border-left: 1px solid var(--border); }
+        .data-table thead th.col-right-sticky { z-index: 14; background: var(--table-header); }
+        .th-sort { cursor: pointer; user-select: none }
+        .th-sort:hover { background: var(--primary-bg); }
+        .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
+        .th-sort.asc .sort-icon, .th-sort.desc .sort-icon { opacity: 1; color: var(--primary); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+        .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
+        .link:hover { text-decoration: underline; }
+        .config-link { color: var(--warning); cursor: pointer; font-weight: 600; background: var(--warning-bg); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--warning-border); }
+        .config-link:hover { background: var(--warning-border); text-decoration: none; }
+        .editable-input { height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; width: 100%; min-width: 120px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
+        .editable-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
+        .pagination { display: flex; align-items: center; gap: 8px; }
+        .page-info { padding: 0 8px; }
+        .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        .toast-icon { font-size: 16px; }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
+        .modal-overlay.show { display: block; }
+        .drawer { display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 650px; max-width: 90vw; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.12); z-index: 1001; flex-direction: column; overflow: hidden; transform: translateX(100%); transition: transform 0.3s; }
+        .drawer.show { display: flex; transform: translateX(0); }
+        .drawer-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .drawer-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .modal-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 18px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--border-light); color: var(--text); }
+        .drawer-body { padding: 6px; flex: 1; min-height: 0; overflow-y: auto; }
+        .drawer-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .footer-actions { display: flex; gap: 8px; }
+        .footer-hint { font-size: 12px; color: var(--text-muted); }
+        .sub-query { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; padding: 12px; background: var(--bg); border-radius: var(--radius); }
+        .sub-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+        .sub-table th, .sub-table td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+        .sub-table thead th { position: sticky; top: 0; background: var(--table-header); font-weight: 600; z-index: 10; }
+        .sub-table-scroll { max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); margin-top: 10px; }
+        .check-bar { display: flex; gap: 12px; margin-bottom: 10px; align-items: center; padding: 8px 12px; background: var(--primary-bg); border-radius: var(--radius); }
+        .check-bar label { font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .selected-info { margin-left: auto; font-size: 13px; color: var(--primary); font-weight: 600; }
+        .draggable-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1002; min-width: 680px; max-width: 85vw; max-height: 80vh; flex-direction: column; overflow: hidden; }
+        .draggable-modal.show { display: flex; }
+        .draggable-modal .modal-header { padding: 4px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); cursor: move; }
+        .draggable-modal .modal-header:active { cursor: grabbing; }
+        .modal-body-drag { padding: 16px; flex: 1; min-height: 0; overflow-y: auto; }
+        .modal-footer-drag { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
+    <header class="app-header">
+        <div class="app-title">工单齐套管理系统</div>
+        <div class="tab-bar"></div>
+    </header>
+    <div class="page-container">
+        <div class="unified-toolbar">
+            <div class="toolbar-row">
+                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">C1 齐套规则配置</span></span>
+                <div class="toolbar-actions">
+                    <button class="btn btn-sm btn-link" onclick="doAdd()">➕ 新增</button>
+                    <button class="btn btn-sm btn-link" onclick="doDelete()">🗑 删除</button>
+                    <button class="btn btn-sm btn-link" onclick="exportData()">📥 导出</button>
+                </div>
+            </div>
+            <div class="toolbar-query">
+                <div class="query-item"><span class="query-label">配置编码</span><input type="text" id="qCode" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">组织</span><select id="qOrg"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="doSearch()">🔍 查询</button>
+                <button class="btn btn-sm" onclick="resetQuery()">↺ 重置</button>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <span>💡 提示：配置"组织"为必填项，未配置组织不允许配置其他参数</span>
+        </div>
+        <div class="table-container">
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table class="data-table" id="mainTable">
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div>共 <strong id="totalCount">0</strong> 条配置</div>
+                    <div>每页 <select id="pageSizeSelect" onchange="changePageSize()" style="height:26px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 6px;font-size:12px;"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option></select> 条</div>
+                    <div class="pagination">
+                        <button class="btn btn-sm" onclick="prevPage()">◀ 上一页</button>
+                        <span class="page-info"><span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                        <button class="btn btn-sm" onclick="nextPage()">下一页 ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- C1_1 组织配置抽屉 -->
+    <div class="modal" id="c1_1Overlay" onclick="closeDrawer('c1_1')"></div>
+    <div class="drawer" id="c1_1Drawer">
+        <div class="drawer-header"><h3>📋 C1_1 组织配置</h3><button class="modal-close" onclick="closeDrawer('c1_1')">×</button></div>
+        <div class="drawer-body">
+            <div class="sub-query">
+                <div class="query-item"><span class="query-label">组织</span><select id="c1_1Org"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_1Data()">🔍 查询</button>
+            </div>
+            <div class="check-bar">
+                <label><input type="checkbox" id="c1_1SelectAll" onchange="toggleAllC1_1(this)"> 全选</label>
+                <label><input type="checkbox" onchange="invertAllC1_1()"> 反选</label>
+                <span class="selected-info" id="c1_1SelectedCount">已选 0 项</span>
+            </div>
+            <div class="sub-table-scroll">
+ <table class="sub-table">
+                    <thead><tr><th width="40"><input type="checkbox" id="c1_1SelectAll2" onchange="toggleAllC1_1(this)"></th><th>序号</th><th>组织ID</th><th>组织</th></tr></thead>
+                    <tbody id="c1_1TableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <span class="footer-hint">勾选的组织将配置到当前规则中</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeDrawer('c1_1')">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyC1_1Config()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- C1_2 分类码配置抽屉 -->
+    <div class="modal-overlay" id="c1_2Overlay" onclick="closeDrawer('c1_2')"></div>
+    <div class="drawer" id="c1_2Drawer">
+        <div class="drawer-header"><h3>📋 C1_2 分类码配置</h3><button class="modal-close" onclick="closeDrawer('c1_2')">×</button></div>
+        <div class="drawer-body">
+            <div class="sub-query">
+                <div class="query-item"><span class="query-label">组织</span><select id="c1_2Org"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_2Data()">🔍 查询</button>
+            </div>
+            <div class="check-bar">
+                <label><input type="checkbox" id="c1_2SelectAll" onchange="toggleAllC1_2(this)"> 全选</label>
+                <span class="selected-info" id="c1_2SelectedCount">已选 0 项</span>
+            </div>
+            <div class="sub-table-scroll">
+                <table class="sub-table">
+                    <thead><tr><th width="40"><input type="checkbox" id="c1_2SelectAll2" onchange="toggleAllC1_2(this)"></th><th>序号</th><th>组织</th><th>分类码</th></tr></thead>
+                    <tbody id="c1_2TableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <span class="footer-hint">数据：EBS WIP_ACCOUNTING_CLASSES</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeDrawer('c1_2')">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyC1_2Config()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- C1_3 供给仓位配置抽屉 -->
+    <div class="modal-overlay" id="c1_3Overlay" onclick="closeDrawer('c1_3')"></div>
+    <div class="drawer" id="c1_3Drawer" style="width:720px;">
+        <div class="drawer-header"><h3>📋 C1_3 EBS供给仓位配置</h3><button class="modal-close" onclick="closeDrawer('c1_3')">×</button></div>
+        <div class="drawer-body">
+            <div class="sub-query">
+                <div class="query-item"><span class="query-label" style="color:var(--danger)">组织 *</span><select id="c1_3Org"><option value="">请选择</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_3Data()">🔍 查询</button>
+            </div>
+            <div class="check-bar">
+                <label><input type="checkbox" id="c1_3SelectAll" onchange="toggleAllC1_3(this)"> 全选</label>
+                <span class="selected-info" id="c1_3SelectedCount">已选 0 项</span>
+            </div>
+            <div class="sub-table-scroll">
+                <table class="sub-table">
+                    <thead><tr><th width="40"><input type="checkbox" id="c1_3SelectAll2" onchange="toggleAllC1_3(this)"></th><th>组织</th><th>EBS供给仓位配置</th><th>EBS供给仓位说明</th><th>操作</th></tr></thead>
+                    <tbody id="c1_3TableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <span class="footer-hint">数据来源：EBS MRP_SCHEDULE_DESIGNATORS</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeDrawer('c1_3')">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyC1_3Config()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- C1_4 供应商配置抽屉 -->
+    <div class="modal-overlay" id="c1_4Overlay" onclick="closeDrawer('c1_4')"></div>
+    <div class="drawer" id="c1_4Drawer">
+        <div class="drawer-header"><h3>📋 C1_4 供应商配置</h3><button class="modal-close" onclick="closeDrawer('c1_4')">×</button></div>
+        <div class="drawer-body">
+            <div class="sub-query">
+                <div class="query-item"><span class="query-label" style="color:var(--danger)">组织 *</span><select id="c1_4Org"><option value=""></option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_4Data()">🔍 查询</button>
+            </div>
+            <div class="check-bar">
+                <label><input type="checkbox" id="c1_4SelectAll" onchange="toggleAllC1_4(this)"> 全选</label>
+                <span class="selected-info" id="c1_4SelectedCount">已选 0 项</span>
+            </div>
+            <div class="sub-table-scroll">
+                <table class="sub-table">
+                    <thead><tr><th width="40"><input type="checkbox" id="c1_4SelectAll2" onchange="toggleAllC1_4(this)"></th><th>组织</th><th>供应商编码</th><th>供应商简称</th></tr></thead>
+                    <tbody id="c1_4TableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <span class="footer-hint">数据来源：EBS AP_SUPPLIERS (委外供应商)</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeDrawer('c1_4')">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyC1_4Config()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- C1_5 工单状态配置抽屉 -->
+    <div class="modal-overlay" id="c1_5Overlay" onclick="closeDrawer('c1_5')"></div>
+    <div class="drawer" id="c1_5Drawer" style="width:500px;">
+        <div class="drawer-header"><h3>📋 C1_5 工单状态配置</h3><button class="modal-close" onclick="closeDrawer('c1_5')">×</button></div>
+        <div class="drawer-body">
+            <div class="sub-query">
+                <button class="btn btn-primary btn-sm" onclick="filterC1_5Data()">🔍 查询</button>
+            </div>
+            <div class="check-bar">
+                <label><input type="checkbox" id="c1_5SelectAll" onchange="toggleAllC1_5(this)"> 全选</label>
+                <span class="selected-info" id="c1_5SelectedCount">已选 0 项</span>
+            </div>
+            <div class="sub-table-scroll">
+                <table class="sub-table">
+                    <thead><tr><th width="40"><input type="checkbox" id="c1_5SelectAll2" onchange="toggleAllC1_5(this)"></th><th>工单状态</th></tr></thead>
+                    <tbody id="c1_5TableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <span class="footer-hint">数据来源：EBS fnd_lookup_values (WIP_JOB_STATUS)</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeDrawer('c1_5')">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyC1_5Config()">确认</button>
+            </div>
+ </div>    </div
+
+    <!-- C1_3_1 仓位选择弹窗（可拖动） -->
+    <div class="modal-overlay" id="c1_3_1Overlay" onclick="closeC1_3_1Modal()"></div>
+    <div class="draggable-modal" id="c1_3_1Modal">
+        <div class="modal-header" id="c1_3_1Header">
+            <h3>📋 C1_3_1 仓位明细选择</h3>
+            <button class="modal-close" onclick="closeC1_3_1Modal()">×</button>
+        </div>
+        <div class="modal-body-drag">
+            <div class="sub-query">
+                <div class="query-item"><span class="query-label">组织</span><select id="c1_3_1Org"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <div class="query-item"><span class="query-label">仓位编码</span><input type="text" id="c1_3_1Code" placeholder="输入仓位编码"></div>
+                <div class="query-item"><span class="query-label">仓位说明</span><input type="text" id="c1_3_1Name" placeholder="输入仓位说明"></div>
+                <button class="btn btn-primary btn-sm" onclick="filterC1_3_1Data()">🔍 查询</button>
+            </div>
+            <div class="check-bar">
+                <label><input type="checkbox" id="c1_3_1SelectAll" onchange="toggleAllC1_3_1(this)"> 全选</label>
+                <label><input type="checkbox" onchange="invertAllC1_3_1()"> 反选</label>
+                <span class="selected-info" id="c1_3_1SelectedCount">已选 0 项</span>
+            </div>
+            <div class="sub-table-scroll" style="max-height:340px;">
+                <table class="sub-table">
+                    <thead><tr><th width="40"><input type="checkbox" onchange="toggleAllC1_3_1(this)"></th><th>组织</th><th>仓位编码</th><th>仓位说明</th></tr></thead>
+                    <tbody id="c1_3_1TableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer-drag">
+            <span class="footer-hint">双击行快速选择 | 数据来源：EBS MRP_SUB_INVENTORIES</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeC1_3_1Modal()">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="confirmC1_3_1Selection()">确认选择</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 表格字段定义 - 已移除"是否有效"字段
+        var tableFields = [
+            {field: 'seqNo', name: '序号', visible: true, width: 60},
+            {field: 'configCode', name: '配置编码', visible: true, width: 120},
+            {field: 'configDesc', name: '配置描述', visible: true, width: 180},
+            {field: 'orgName', name: '组织', visible: true, width: 120, config: true, configType: 'c1_1'},
+            {field: 'categoryCode', name: '分类码', visible: true, width: 120, config: true, configType: 'c1_2'},
+            {field: 'calcSubInvNetValueName', name: 'EBS供给仓位配置', visible: true, width: 150, config: true, configType: 'c1_3'},
+            {field: 'calcSubInvNetValueDesc', name: 'EBS供给仓位配置说明', visible: true, width: 180},
+            {field: 'supplierCode', name: '供应商编码', visible: true, width: 120, config: true, configType: 'c1_4'},
+            {field: 'supplierDesc', name: '供应商简称', visible: true, width: 150},
+            {field: 'workOrderStatus', name: '工单状态', visible: true, width: 120, config: true, configType: 'c1_5'},
+            {field: 'createdBy', name: '创建人', visible: true, width: 100},
+            {field: 'createDate', name: '创建日期', visible: true, width: 120},
+            {field: 'updatedBy', name: '编辑人', visible: true, width: 100},
+            {field: 'updateDate', name: '编辑日期', visible: true, width: 120}
+        ];
+
+        // 全局变量
+        var allData = [];
+        var filteredData = [];
+        var currentPage = 1;
+        var pageSize = 50;
+        var sortField = '';
+        var sortDirection = '';
+        var currentEditIndex = -1;
+
+        // EBS组织数据 - 已移除enabled字段
+        var ebsOrgData = [
+            {seqNo: 1, orgId: '101', orgName: '深圳工厂'},
+            {seqNo: 2, orgId: '102', orgName: '上海工厂'},
+            {seqNo: 3, orgId: '103', orgName: '北京工厂'},
+            {seqNo: 4, orgId: '104', orgName: '成都工厂'}
+        ];
+
+        // EBS分类码数据 - 已移除active字段
+        var ebsCategoryData = [
+            {seqNo: 1, orgName: '深圳工厂', categoryCode: 'STD_CLASS'},
+            {seqNo: 2, orgName: '深圳工厂', categoryCode: 'FOUR_CLASS'},
+            {seqNo: 3, orgName: '上海工厂', categoryCode: 'STD_CLASS'},
+            {seqNo: 4, orgName: '上海工厂', categoryCode: 'EXPRESS_CLASS'}
+        ];
+
+        // EBS供给仓位数据 - 已移除active字段
+        var ebsSubInventoryData = [
+            {orgName: '深圳工厂', subCode: 'FG_SUB', subDesc: '成品仓净值'},
+            {orgName: '深圳工厂', subCode: 'RAW_SUB', subDesc: '原材料仓净值'},
+            {orgName: '上海工厂', subCode: 'FG_SUB', subDesc: '成品仓净值'},
+            {orgName: '上海工厂', subCode: 'RAW_SUB', subDesc: '原材料仓净值'}
+        ];
+
+        // EBS供应商数据 - 已移除active字段
+        var ebsSupplierData = [
+            {orgName: '深圳工厂', supplierCode: 'SUP-001', supplierName: '深圳华天科技'},
+            {orgName: '深圳工厂', supplierCode: 'SUP-002', supplier: '深圳长电科技'},
+            {orgName: '上海工厂', supplierCode: 'SUP-003', supplierName: '上海力晶半导体'},
+            {orgName: '上海工厂', supplierCode: 'SUP-004', supplierName: '上海通富微'}
+        ];
+
+        // EBS工单状态数据 - 已移除active字段
+        var ebsWorkOrderStatusData = [
+            {status: '已发放'},
+            {status: '未发放'},
+            {status: '进行中'},
+            {status: '完工'}
+        ];
+
+        // EBS仓位明细数据 - 已移除字段
+        var ebsSubInventoryDetailData = [
+            {subCode: 'FG_SUB', subName: '成品仓净值', subType: '成品仓', orgName: '深圳工厂'},
+            {subCode: 'RAW_SUB', subName: '原材料仓净值', subType: '原材料仓', orgName: '深圳工厂'},
+            {subCode: 'WIP_SUB', subName: '在制品仓净值', subType: '在制品仓', orgName: '深圳工厂'},
+            {subCode: 'FG_SUB', subName: '成品仓净值', subType: '成品仓', orgName: '上海工厂'},
+            {subCode: 'RAW_SUB', subName: '原材料仓净值', subType: '原材料仓', orgName: '上海工厂'},
+            {subCode: 'MTL_SUB', subName: '杂项仓净值', subType: '杂项仓', orgName: '上海工厂'},
+            {subCode: 'FG_SUB', subName: '成品仓净值', subType: '成品仓', orgName: '北京工厂'},
+            {subCode: 'RAW_SUB', subName: '原材料仓净值', subType: '原材料仓', orgName: '北京工厂'},
+            {subCode: 'FG_SUB', subName: '成品仓净值', subType: '成品仓', orgName: '成都工厂'},
+            {subCode: 'RCV_SUB', subName: '接收仓', subType: '接收仓', orgName: '成都工厂'}
+        ];
+
+        // C1_3_1当前选中的行索引和选中状态
+        var c1_3_1RowIndex = -1;
+        var c1_3_1FilteredData = [];
+        var c1_3_1Selected = [];
+
+        // 选中状态
+        var c1_1Selected = [];
+        var c1_2Selected = [];
+        var c1_3Selected = [];
+        var c1_4Selected = [];
+        var c1_5Selected = [];
+
+        // 格式化日期
+        function formatDate(date) {
+            var y = date.getFullYear();
+            var m = String(date.getMonth() + 1).padStart(2, '0');
+            var d = String(date.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + d;
+        }
+
+        // 生成配置编码
+        function generateConfigCode() {
+            var now = new Date();
+            var year = String(now.getFullYear()).slice(-2);
+            var month = String(now.getMonth() + 1).padStart(2, '0');
+            var num = String(allData.length + 1).padStart(5, '0');
+            return year + month + num;
+        }
+
+        // 生成模拟数据 - 已移除isActive字段
+        function generateMockData() {
+            var orgs = ['深圳工厂', '上海工厂', '北京工厂', '成都工厂'];
+            var users = ['张三', '李四', '王五', '赵六'];
+            var categories = ['STD_CLASS', 'FOUR_CLASS', 'EXPRESS_CLASS'];
+            var subs = [
+                {code: 'FG_SUB', desc: '成品仓净值'},
+                {code: 'RAW_SUB', desc: '原材料仓净值'},
+                {code: 'WIP_SUB', desc: '在制品仓净值'}
+            ];
+            var suppliers = [
+                {code: 'SUP-001', name: '深圳华天科技'},
+                {code: 'SUP-002', name: '深圳长电科技'},
+                {code: 'SUP-003', name: '上海力晶半导体'},
+                {code: 'SUP-004', name: '上海通富微'}
+            ];
+            var statuses = ['已发放', '进行中', '完工'];
+
+            allData = [];
+            for (var i = 1; i <= 50; i++) {
+                var createDate = new Date();
+                createDate.setDate(createDate.getDate() - Math.floor(Math.random() * 90));
+                var updateDate = new Date(createDate);
+                updateDate.setDate(updateDate.getDate() + Math.floor(Math.random() * 30));
+
+                var sub = subs[Math.floor(Math.random() * subs.length)];
+                var supplier = suppliers[Math.floor(Math.random() * suppliers.length)];
+
+                allData.push({
+                    seqNo: i,
+                    configCode: generateConfigCode(),
+                    configDesc: '齐套规则配置方案' + i,
+                    orgName: orgs[Math.floor(Math.random() * orgs.length)],
+                    categoryCode: categories[Math.floor(Math.random() * categories.length)],
+                    calcSubInvNetValueName: sub.code,
+                    calcSubInvNetValueDesc: sub.desc,
+                    supplierCode: supplier.code,
+                    supplierDesc: supplier.name,
+                    workOrderStatus: statuses[Math.floor(Math.random() * statuses.length)],
+                    createdBy: users[Math.floor(Math.random() * users.length)],
+                    createDate: formatDate(createDate),
+                    updatedBy: users[Math.floor(Math.random() * users.length)],
+                    updateDate: formatDate(updateDate)
+                });
+            }
+            filteredData = allData.slice();
+        }
+
+        // 渲染表头 - 已移除isActive相关逻辑
+        function renderTableHeader() {
+            var html = '<tr>';
+            html += '<th class="col-check"><input type="checkbox" id="mainSelectAll" onchange="toggleMainTableAll(this)"></th>';
+
+            tableFields.forEach(function(field) {
+                if (!field.visible) return;
+
+                var cls = ' th-sort';
+                var sortIcon = '▲';
+                if (sortField === field.field) {
+                    cls += ' ' + sortDirection;
+                    sortIcon = sortDirection === 'asc' ? '▲' : '▼';
+                }
+
+                html += '<th class="' + cls + '" onclick="sortTable(\'' + field.field + '\')" style="width:' + (field.width || 'auto') + ';">';
+                html += field.name + '<span class="sort-icon">' + sortIcon + '</span></th>';
+            });
+
+            html += '<th class="col-right-sticky" style="width:180px;">操作</th>';
+            html += '</tr>';
+            document.getElementById('tableHead').innerHTML = html;
+        }
+
+        // 渲染表格数据 - 已移除isActive相关逻辑
+        function renderTableBody() {
+            var start = (currentPage - 1) * pageSize;
+            var end = Math.min(start + pageSize, filteredData.length);
+
+            var html = '';
+            for (var i = start; i < end; i++) {
+                var row = filteredData[i];
+                html += '<tr data-index="' + i + '">';
+                html += '<td class="col-check"><input type="checkbox"></td>';
+
+                tableFields.forEach(function(field) {
+                    if (!field.visible) return;
+                    var value = row[field.field];
+
+                    if (field.config) {
+                        html += '<td><span class="config-link" onclick="openConfigDrawer(\'' + field.configType + '\',' + i + ')">' + (value || '未配置') + '</span></td>';
+                    } else if (field.field === 'configDesc') {
+                        html += '<td><input type="text" class="editable-input" value="' + (value || '') + '" onchange="updateField(' + i + ',\'configDesc\',this.value)" placeholder="输入配置描述"></td>';
+                    } else {
+                        html += '<td>' + (value !== undefined && value !== null ? value : '') + '</td>';
+                    }
+                });
+
+                html += '<td class="col-right-sticky">';
+                html += '<a class="link" onclick="saveRow(' + i + ')">💾 保存</a> | ';
+                html += '<a class="link" onclick="deleteRow(' + i + ')">🗑 删除</a>';
+                html += '</td></tr>';
+            }
+
+            document.getElementById('tableBody').innerHTML = html;
+        }
+
+        // 渲染表格
+        function renderTable() {
+            renderTableHeader();
+            renderTableBody();
+            renderPagination();
+        }
+
+        // 渲染分页
+        function renderPagination() {
+            document.getElementById('totalCount').textContent = filteredData.length;
+            var totalPages = Math.ceil(filteredData.length / pageSize) || 1;
+            document.getElementById('currentPage').textContent = currentPage;
+            document.getElementById('totalPages').textContent = totalPages;
+        }
+
+        // 排序
+        function sortTable(field) {
+            if (sortField === field) {
+                if (sortDirection === 'asc') {
+                    sortDirection = 'desc';
+                } else if (sortDirection === 'desc') {
+                    sortField = '';
+                    sortDirection = '';
+                }
+            } else {
+                sortField = field;
+                sortDirection = 'asc';
+            }
+
+            if (sortField) {
+                filteredData.sort(function(a, b) {
+                    var va = a[sortField];
+                    var vb = b[sortField];
+                    if (va == null) va = '';
+                    if (vb == null) vb = '';
+                    var na = parseFloat(va);
+                    var nb = parseFloat(vb);
+                    if (!isNaN(na) && !isNaN(nb)) {
+                        return sortDirection === 'asc' ? na - nb : nb - na;
+                    }
+                    va = String(va);
+                    vb = String(vb);
+                    if (va < vb) return sortDirection === 'asc' ? -1 : 1;
+                    if (va > vb) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            currentPage = 1;
+            renderTable();
+        }
+
+        // 保存行
+        function saveRow(index) {
+            if (filteredData[index]) {
+                filteredData[index].updatedBy = '当前用户';
+                filteredData[index].updateDate = formatDate(new Date());
+                allData[index] = filteredData[index];
+                showToast(' ' + filteredData[index].configCode + ' 已保存', 'success');
+            }
+        }
+
+        // 删除行
+        function deleteRow(index) {
+            if (!confirm('确定删除配置 ' + filteredData[index].configCode + '？')) return;
+            allData.splice(index, 1);
+            filteredData.splice(index, 1);
+            renumberSeq();
+            currentPage = 1;
+            renderTable();
+            showToast('已删除', 'success');
+        }
+
+        // 重新编号
+        function renumberSeq() {
+            for (var i = 0; i < allData.length; i++) {
+                allData[i].seqNo = i + 1;
+            }
+        }
+
+        // 切换主表格全选
+        function toggleMainTableAll(cb) {
+            var checkboxes = document.querySelectorAll('#tableBody input[type="checkbox"]');
+            checkboxes.forEach(function(c) { c.checked = cb.checked; });
+        }
+
+        // 分页操作
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            var totalPages = Math.ceil(filteredData.length / pageSize);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        // 查询 - 已移除isActive查询条件
+        function doSearch() {
+            var code = document.getElementById('qCode').value.trim();
+            var org = document.getElementById('qOrg').value;
+
+            filteredData = allData.filter(function(item) {
+                if (code && item.configCode.indexOf(code) === -1) return false;
+                if (org && item.orgName !== org) return false;
+                return true;
+            });
+
+            currentPage = 1;
+            renderTable();
+            showToast('查询完成，共 ' + filteredData.length + ' 条记录', 'success');
+        }
+
+        // 重置查询 - 已移除qActive
+        function resetQuery() {
+            document.getElementById('qCode').value = '';
+            document.getElementById('qOrg').value = '';
+            filteredData = allData.slice();
+            currentPage = 1;
+            renderTable();
+            showToast('查询条件已重置', 'success');
+        }
+
+        // 新增行 - 已移除isActive
+        function addNewRow() {
+            var newRow = {
+                seqNo: allData.length + 1,
+                configCode: generateConfigCode(),
+                configDesc: '新配置',
+                orgName: '',
+                categoryCode: '',
+                calcSubInvNetValueName: '',
+                calcSubInvNetValueDesc: '',
+                supplierCode: '',
+                supplierDesc: '',
+                workOrderStatus: '',
+                createdBy: '当前用户',
+                createDate: formatDate(new Date()),
+                updatedBy: '当前用户',
+                updateDate: formatDate(new Date())
+            };
+            allData.unshift(newRow);
+            filteredData = allData.slice();
+            currentPage = 1;
+            renderTable();
+            showToast('已新增行，请及时保存', 'success');
+        }
+
+        // 删除选中行
+        function deleteSelectedRows() {
+            var checkboxes = document.querySelectorAll('#tableBody input[type="checkbox"]:checked');
+            if (checkboxes.length === 0) {
+                showToast('请先选择要删除的行', 'error');
+                return;
+            }
+            if (!confirm('确定删除选中的 ' + checkboxes.length + ' 条记录？')) return;
+
+            var indices = [];
+            checkboxes.forEach(function(cb) {
+                var tr = cb.closest('tr');
+                indices.push(parseInt(tr.dataset.index));
+            });
+
+            indices.sort(function(a, b) { return b - a; });
+            indices.forEach(function(idx) {
+                allData.splice(idx, 1);
+                filteredData.splice(idx, 1);
+            });
+
+            renumberSeq();
+            currentPage = 1;
+            renderTable();
+            showToast('已删除 ' + indices.length + ' 条记录', 'success');
+        }
+
+        // 导出数据
+        function exportData() {
+            var headers = tableFields.filter(function(f) { return f.visible; }).map(function(f) { return f.name; });
+            var csv = '\ufeff' + headers.join('\t') + '';
+
+            filteredData.forEach(function(row) {
+                var values = tableFields.filter(function(f) { return f.visible; }).map(function(f) {
+                    var v = row[f.field];
+                    return v !== undefined && v !== null ? v : '';
+                });
+                csv += values.join('\t') + '';
+            });
+
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = '齐套规则配置_' + formatDate(new Date()) + '.csv';
+            link.click();
+            showToast('导出成功', 'success');
+        }
+
+        // 打开配置抽屉
+        function openConfigDrawer(type, index) {
+            currentEditIndex = index;
+            document.getElementById(type + 'Overlay').classList.add('show');
+            document.getElementById(type + 'Drawer').classList.add('show');
+
+            if (type === 'c1_1') { renderC1_1Table(); c1_1Selected = []; }
+            if (type === 'c1_2') { renderC1_2Table(); c1_2Selected = []; }
+            if (type === 'c1_3') { renderC1_3Table(); c1_3Selected = []; }
+            if (type === 'c1_4') { renderC1_4Table(); c1_4Selected = []; }
+            if (type === 'c1_5') { renderC1_5Table(); c1_5Selected = []; }
+        }
+
+        // 关闭抽屉
+        function closeDrawer(type) {
+            document.getElementById(type + 'Overlay').classList.remove('show');
+            document.getElementById(type + 'Drawer').classList.remove('show');
+        }
+
+        // 渲染C1_1表格 - 已移除enabled列
+        function renderC1_1Table() {
+            var html = '';
+            ebsOrgData.forEach(function(item, i) {
+                html += '<tr><td><input type="checkbox" onchange="toggleC1_1(' + i + ', this.checked)"></td>';
+                html += '<td>' + item.seqNo + '</td>';
+                html += '<td>' + item.orgId + '</td>';
+                html += '<td>' + item.orgName + '</td></tr>';
+            });
+            document.getElementById('c1_1TableBody').innerHTML = html;
+            updateC1_1Count();
+        }
+
+        function toggleC1_1(index, checked) {
+            if (checked) {
+                if (c1_1Selected.indexOf(index) === -1) c1_1Selected.push(index);
+            } else {
+                c1_1Selected = c1_1Selected.filter(function(i) { return i !== index; });
+            }
+            updateC1_1Count();
+        }
+
+        function toggleAllC1_1(cb) {
+            c1_1Selected = [];
+            if (cb.checked) {
+                ebsOrgData.forEach(function(_, i) { c1_1Selected.push(i); });
+            }
+            document.querySelectorAll('#c1_1TableBody input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+            updateC1_1Count();
+        }
+
+        function invertAllC1_1() {
+            c1_1Selected = [];
+            ebsOrgData.forEach(function(_, i) {
+                if (c1_1Selected.indexOf(i) === -1) c1_1Selected.push(i);
+            });
+            document.querySelectorAll('#c1_1TableBody input[type="checkbox"]').forEach(function(c, i) {
+                c.checked = c1_1Selected.indexOf(i) !== -1;
+            });
+            updateC1_1Count();
+        }
+
+        function updateC1_1Count() {
+            document.getElementById('c1_1SelectedCount').textContent = '已选 ' + c1_1Selected.length + ' 项';
+        }
+
+        function filterC1_1Data() { renderC1_1Table(); }
+
+        function applyC1_1Config() {
+            if (currentEditIndex >= 0 && filteredData[currentEditIndex]) {
+                var orgs = c1_1Selected.map(function(i) { return ebsOrgData[i].orgName; });
+                filteredData[currentEditIndex].orgName = orgs.join(',');
+                allData[currentEditIndex] = filteredData[currentEditIndex];
+            }
+            closeDrawer('c1_1');
+            renderTable();
+            showToast('组织已配置 (' + c1_1Selected.length + '个)', 'success');
+        }
+
+        // C1_2 相关函数 - 已移除active列
+        function renderC1_2Table() {
+            var html = '';
+            ebsCategoryData.forEach(function(item, i) {
+                html += '<tr><td><input type="checkbox" onchange="toggleC1_2(' + i + ', this.checked)"></td>';
+                html += '<td>' + item.seqNo + '</td>';
+                html += '<td>' + item.orgName + '</td>';
+                html += '<td>' + item.categoryCode + '</td></tr>';
+            });
+            document.getElementById('c1_2TableBody').innerHTML = html;
+            updateC1_2Count();
+        }
+
+        function toggleC1_2(index, checked) {
+            if (checked) { if (c1_2Selected.indexOf(index) === -1) c1_2Selected.push(index); }
+            else { c1_2Selected = c1_2Selected.filter(function(i) { return i !== index; }); }
+            updateC1_2Count();
+        }
+
+        function toggleAllC1_2(cb) {
+            c1_2Selected = [];
+            if (cb.checked) { ebsCategoryData.forEach(function(_, i) { c1_2Selected.push(i); }); }
+            document.querySelectorAll('#c1_2TableBody input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+            updateC1_2Count();
+        }
+
+        function updateC1_2Count() {
+            document.getElementById('c1_2SelectedCount').textContent = '已选 ' + c1_2Selected.length + ' 项';
+        }
+
+        function filterC1_2Data() { renderC1_2Table(); }
+
+        function applyC1_2Config() {
+            if (currentEditIndex >= 0 && filteredData[currentEditIndex]) {
+                var cats = c1_2Selected.map(function(i) { return ebsCategoryData[i].categoryCode; });
+                filteredData[currentEditIndex].categoryCode = cats.join(',');
+                allData[currentEditIndex] = filteredData[currentEditIndex];
+            }
+            closeDrawer('c1_2');
+            renderTable();
+            showToast('分类码已配置 (' + c1_2Selected.length + '个)', 'success');
+        }
+
+        // C1_3 相关函数 - 已移除active列
+        function renderC1_3Table() {
+            var html = '';
+            ebsSubInventoryData.forEach(function(item, i) {
+                html += '<tr><td><input type="checkbox" onchange="toggleC1_3(' + i + ', this.checked)"></td>';
+                html += '<td>' + item.orgName + '</td>';
+                html += '<td>' + item.subCode + '</td>';
+                html += '<td>' + item.subDesc + '</td>';
+                html += '<td><a class="link" onclick="openC1_3_1Modal(' + i + ')">选择仓位</a></td></tr>';
+            });
+            document.getElementById('c1_3TableBody').innerHTML = html;
+            updateC1_3Count();
+        }
+
+        // 打开C1_3_1仓位明细弹窗
+        function openC1_3_1Modal(rowIndex) {
+            c1_3_1RowIndex = rowIndex;
+            c1_3_1FilteredData = ebsSubInventoryDetailData.slice();
+            document.getElementById('c1_3_1Code').value = '';
+            document.getElementById('c1_3_1Overlay').classList.add('show');
+            document.getElementById('c1_3_1Modal').classList.add('show');
+            renderC1_3_1Table();
+        }
+
+        // 关闭C1_3_1弹窗
+        function closeC1_3_1Modal() {
+            document.getElementById('c1_3_1Overlay').classList.remove('show');
+            document.getElementById('c1_3_1Modal').classList.remove('show');
+        }
+
+        // 渲染C1_3_1仓位明细表格 - 已移除是否有效列
+        function renderC1_3_1Table() {
+            var html = '';
+            c1_3_1FilteredData.forEach(function(item, i) {
+                var sel = c1_3_1Selected.indexOf(i) !== -1;
+                html += '<tr ondblclick="doubleClickC1_3_1(' + i + ')">';
+                html += '<td><input type="checkbox" ' + (sel ? 'checked' : '') + ' onchange="toggleC1_3_1Item(' + i + ', this.checked)"></td>';
+                html += '<td>' + item.orgName + '</td>';
+                html += '<td>' + item.subCode + '</td>';
+                html += '<td>' + item.subName + '</td>';
+                html += '</tr>';
+            });
+            document.getElementById('c1_3_1TableBody').innerHTML = html;
+            updateC1_3_1Count();
+        }
+
+        function toggleC1_3_1Item(index, checked) {
+            if (checked) { if (c1_3_1Selected.indexOf(index) === -1) c1_3_1Selected.push(index); }
+            else { c1_3_1Selected = c1_3_1Selected.filter(function(i){ return i !== index; }); }
+            updateC1_3_1Count();
+        }
+
+        function doubleClickC1_3_1(index) {
+            c1_3_1Selected = [index];
+            renderC1_3_1Table();
+        }
+
+        function toggleAllC1_3_1(cb) {
+            c1_3_1Selected = [];
+            if (cb.checked) { c1_3_1FilteredData.forEach(function(_, i){ c1_3_1Selected.push(i); }); }
+            document.querySelectorAll('#c1_3_1TableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; });
+            updateC1_3_1Count();
+        }
+
+        function invertAllC1_3_1() {
+            var newSel = [];
+            c1_3_1FilteredData.forEach(function(_, i) { if (c1_3_1Selected.indexOf(i) === -1) newSel.push(i); });
+            c1_3_1Selected = newSel;
+            renderC1_3_1Table();
+        }
+
+        function updateC1_3_1Count() {
+            document.getElementById('c1_3_1SelectedCount').textContent = '已选 ' + c1_3_1Selected.length + ' 项';
+        }
+
+        // 查询C1_3_1数据 - 已移除active查询
+        function filterC1_3_1Data() {
+            var org = document.getElementById('c1_3_1Org').value;
+            var code = document.getElementById('c1_3_1Code').value.trim();
+            var name = document.getElementById('c1_3_1Name').value.trim();
+            c1_3_1Selected = [];
+            c1_3_1FilteredData = ebsSubInventoryDetailData.filter(function(item) {
+                if (org && item.orgName !== org) return false;
+                if (code && item.subCode.indexOf(code) === -1) return false;
+                if (name && item.subName.indexOf(name) === -1) return false;
+                return true;
+            });
+            renderC1_3_1Table();
+            showToast('查询完成，共 ' + c1_3_1FilteredData.length + ' 条记录', 'success');
+        }
+
+        // 确认选择C1_3_1仓位
+        function confirmC1_3_1Selection() {
+            if (c1_3_1Selected.length === 0) { showToast('请先选择仓位', 'error'); return; }
+            if (c1_3_1RowIndex >= 0) {
+                var sel = c1_3_1FilteredData[c1_3_1Selected[0]];
+                ebsSubInventoryData[c1_3_1RowIndex].subCode = sel.subCode;
+                ebsSubInventoryData[c1_3_1RowIndex].subDesc = sel.subName;
+            }
+            showToast('已选择 ' + c1_3_1Selected.length + ' 个仓位', 'success');
+            closeC1_3_1Modal();
+            renderC1_3Table();
+        }
+
+        function toggleC1_3(index, checked) {
+            if (checked) { if (c1_3Selected.indexOf(index) === -1) c1_3Selected.push(index); }
+            else { c1_3Selected = c1_3Selected.filter(function(i) { return i !== index; }); }
+            updateC1_3Count();
+        }
+
+        function toggleAllC1_3(cb) {
+            c1_3Selected = [];
+            if (cb.checked) { ebsSubInventoryData.forEach(function(_, i) { c1_3Selected.push(i); }); }
+            document.querySelectorAll('#c1_3TableBody input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+            updateC1_3Count();
+        }
+
+        function updateC1_3Count() {
+            document.getElementById('c1_3SelectedCount').textContent = '已选 ' + c1_3Selected.length + ' 项';
+        }
+
+        function filterC1_3Data() { renderC1_3Table(); }
+
+        function applyC1_3Config() {
+            if (currentEditIndex >= 0 && filteredData[currentEditIndex]) {
+                var subs = c1_3Selected.map(function(i) { return ebsSubInventoryData[i].subCode; });
+                filteredData[currentEditIndex].calcSubInvNetValueName = subs.join(',');
+                allData[currentEditIndex] = filteredData[currentEditIndex];
+            }
+            closeDrawer('c1_3');
+            renderTable();
+            showToast('供给仓位已配置 (' + c1_3Selected.length + '个)', 'success');
+        }
+
+        // C1_4 相关函数 - 已移除active列
+        function renderC1_4Table() {
+            var html = '';
+            ebsSupplierData.forEach(function(item, i) {
+                html += '<tr><td><input type="checkbox" onchange="toggleC1_4(' + i + ', this.checked)"></td>';
+                html += '<td>' + item.orgName + '</td>';
+                html += '<td>' + item.supplierCode + '</td>';
+                html += '<td>' + item.supplierName + '</td></tr>';
+            });
+            document.getElementById('c1_4TableBody').innerHTML = html;
+            updateC1_4Count();
+        }
+
+        function toggleC1_4(index, checked) {
+            if (checked) { if (c1_4Selected.indexOf(index) === -1) c1_4Selected.push(index); }
+            else { c1_4Selected = c1_4Selected.filter(function(i) { return i !== index; }); }
+            updateC1_4Count();
+        }
+
+        function toggleAllC1_4(cb) {
+            c1_4Selected = [];
+            if (cb.checked) { ebsSupplierData.forEach(function(_, i) { c1_4Selected.push(i); }); }
+ document.querySelectorAll('#c1_4TableBody input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+            updateC1_4Count();
+        }
+
+        function updateC1_4Count() {
+            document.getElementById('c1_4SelectedCount').textContent = '已选 ' + c1_4Selected.length + ' 项';
+        }
+
+        function filterC1_4Data() { renderC1_4Table(); }
+
+        function applyC1_4Config() {
+            if (currentEditIndex >= 0 && filteredData[currentEditIndex]) {
+                var sups = c1_4Selected.map(function(i) { return ebsSupplierData[i].supplierCode; });
+                filteredData[currentEditIndex].supplierCode = sups.join(',');
+                allData[currentEditIndex] = filteredData[currentEditIndex];
+            }
+            closeDrawer('c1_4');
+            renderTable();
+            showToast('供应商已配置 (' + c1_4Selected.length + '个)', 'success');
+        }
+
+        // C1_5 相关函数 - 已移除active列
+        function renderC1_5Table() {
+            var html = '';
+            ebsWorkOrderStatusData.forEach(function(item, i) {
+                html += '<tr><td><input type="checkbox" onchange="toggleC1_5(' + i + ', this.checked)"></td>';
+                html += '<td>' + item.status + '</td></tr>';
+            });
+            document.getElementById('c1_5TableBody').innerHTML = html;
+            updateC1_5Count();
+        }
+
+        function toggleC1_5(index, checked) {
+            if (checked) {
+                if (c1_5Selected.indexOf(index) === -1) c1_5Selected.push(index);
+            } else {
+                c1_5Selected = c1_5Selected.filter(function(i) { return i !== index; });
+            }
+            updateC1_5Count();
+        }
+
+        function toggleAllC1_5(cb) {
+            c1_5Selected = [];
+            if (cb.checked) { ebsWorkOrderStatusData.forEach(function(_, i) { c1_5Selected.push(i); }); }
+            document.querySelectorAll('#c1_5TableBody input[type="checkbox"]').forEach(function(c) { c.checked = cb.checked; });
+            updateC1_5Count();
+        }
+
+        function updateC1_5Count() {
+            document.getElementById('c1_5SelectedCount').textContent = '已选 ' + c1_5Selected.length + ' 项';
+        }
+
+        function filterC1_5Data() { renderC1_5Table(); }
+
+        function applyC1_5Config() {
+            if (currentEditIndex >= 0 && filteredData[currentEditIndex]) {
+                var stats = c1_5Selected.map(function(i) { return ebsWorkOrderStatusData[i].status; });
+                filteredData[currentEditIndex].workOrderStatus = stats.join(',');
+                allData[currentEditIndex] = filteredData[currentEditIndex];
+            }
+            closeDrawer('c1_5');
+            renderTable();
+            showToast('工单状态已配置 (' + c1_5Selected.length + '个)', 'success');
+        }
+
+        // 更新字段值（用于行内编辑）
+        function updateField(index, field, value) {
+            if (filteredData[index]) {
+                filteredData[index][field] = value;
+                allData[index][field] = value;
+                showToast('配置描述已更新', 'success');
+            }
+        }
+
+        // Toast提示
+        function showToast(message, type) {
+            var toast = document.getElementById('toast');
+            toast.querySelector('.toast-icon').textContent = type === 'success' ? '✓' : '✕';
+            toast.querySelector('.toast-message').textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(function() { toast.classList.remove('show'); }, 2500);
+        }
+
+        // 弹窗拖动功能 - 修复版
+        function initDraggableModal(modalId, headerId) {
+            var modal = document.getElementById(modalId);
+            var header = document.getElementById(headerId);
+            if (!modal || !header) return;
+
+            var isDragging = false;
+            var startX, startY, startLeft, startTop;
+            var hasDragged = false;
+
+            header.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                hasDragged = false;
+                startX = e.clientX;
+                startY = e.clientY;
+                
+                // 首次拖动时，将CSS居中转换为固定位置
+                var rect = modal.getBoundingClientRect();
+                if (modal.style.left === '' && modal.style.top === '') {
+                    // 还未拖动过，使用当前实际位置
+                    modal.style.left = rect.left + 'px';
+                    modal.style.top = rect.top + 'px';
+                    modal.style.transform = 'none';
+                    modal.style.margin = '0';
+                }
+                
+                startLeft = parseFloat(modal.style.left) || rect.left;
+                startTop = parseFloat(modal.style.top) || rect.top;
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                hasDragged = true;
+                var dx = e.clientX - startX;
+                var dy = e.clientY - startY;
+                modal.style.left = (startLeft + dx) + 'px';
+                modal.style.top = (startTop + dy) + 'px';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+        }
+
+        // 初始化
+        generateMockData();
+        renderTable();
+        initDraggableModal('c1_3_1Modal', 'c1_3_1Header');
+    </script>
+</body>
+</html>

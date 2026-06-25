@@ -1,0 +1,28 @@
+{
+  "name": "工单齐套原型",
+  "version": "1.0.0",
+  "description": "工单齐套管理系统原型项目",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo \"请在浏览器中打开 index.html\"",
+    "dev": "echo \"请在浏览器中打开 index.html\"",
+    "build": "echo \"原型项目，无需构建\""
+  },
+  "keywords": [
+    "工单齐套",
+    "原型",
+    "管理系统"
+  ],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "devDependencies": {},
+  "dependencies": {}
+}

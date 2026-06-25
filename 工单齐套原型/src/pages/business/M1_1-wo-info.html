@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1_1 WO工单信息表 - 抽屉弹窗</title>
+    <style>
+        :root {
+ --primary: #1677ff; --primary-hover: #4096ff; --primary-bg: #e6f4ff;
+            --success: #52c41a; --success-bg: #f6ffed; --success-border: #b7eb8f;
+            --warning: #fa8c16; --warning-bg: #fff7e6; --warning-border: #ffd591;
+            --danger: #ff4d4f; --danger-bg: #fff2f0; --danger-border: #ffccc7;
+            --border: #e8e8e8; --border-light: #f0f0f0;
+            --bg: #f5f7fa; --bg-white: #ffffff;
+            --text: #1f1f1f; --text-secondary: #595959; --text-muted: #8c8c8c;
+            --header-bg: #001529; --table-header: #fafafa; --table-hover: #f5f8ff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+            --radius: 6px; --radius-sm: 4px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
+
+        /* Drawer styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 1000; }
+        .modal-overlay.show { display: block; }
+        .drawer { display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 95vw; max-width: 1400px; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 1001; flex-direction: column; overflow: hidden; transform: translateX(100%); transition: transform 0.3s ease; }
+        .drawer.show { display: flex; transform: translateX(0); }
+        .drawer-header { height: 48px; padding: 0 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .drawer-header h3 { margin:0; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .drawer-header h3::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .modal-close { width: 32px; height: 32px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--border-light); color: var(--text); }
+        .drawer-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* Query bar */
+        .query-bar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0; }
+        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .query-item input, .query-item select { height: 30px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
+        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .query-label { color: var(--text-secondary); white-space: nowrap; }
+
+        /* Buttons */
+        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+        .btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
+        .btn-link { background: transparent; border: none; color: var(--primary); padding: 4px 8px; height: auto; font-weight: 500; }
+        .btn-link:hover { background: var(--primary-bg); }
+
+        /* Table */
+        .table-container { flex: 1; min-height: 0; padding: 12px 16px; display: flex; flex-direction: column; overflow: hidden; }
+        .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+        .table-scroll { flex: 1; min-height: 0; overflow: auto; }
+        .data-table { font-size: 13px; border-collapse: separate; border-spacing: 0; width: 100%; min-width: max-content; }
+        .data-table th, .data-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; white-space: nowrap; }
+        .data-table thead th { position: sticky; top: 0; z-index: 11; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--table-header); font-size: 12px; }
+        .data-table tbody tr:hover td { background: var(--table-hover); }
+        .col-check { width: 40px; text-align: center; position: sticky; left: 0; z-index: 6; background: var(--table-header); }
+        .data-table thead th.col-check { z-index: 14; }
+        .col-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .col-left-sticky { position: sticky; left: 40px; z-index: 6; min-width: 140px; background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-left-sticky { z-index: 13; background: var(--table-header); }
+        .col-right-sticky { position: sticky; right: 0; z-index: 7; min-width: 120px; border-left: 1px solid var(--border); background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-right-sticky { z-index: 14; background: var(--table-header); border-left: 1px solid var(--border); }
+        .th-sort { cursor: pointer; user-select: none; }
+        .th-sort:hover { background: var(--primary-bg); }
+        .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
+        .th-sort.asc .sort-icon, .th-sort.desc .sort-icon { opacity: 1; color: var(--primary); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+
+        /* Footer */
+        .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
+        .pagination { display: flex; align-items: center; gap: 8px; }
+        .page-info { padding: 0 8px; }
+
+        /* Toast */
+        .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast-icon { font-size: 16px; }
+        .toast.success .toast-icon { color: var(--success); }
+
+        /* Column config modal */
+        .column-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1002; max-height: 85vh; flex-direction: column; overflow: hidden; min-width: 400px; }
+        .column-modal.show { display: flex; }
+        .column-modal .modal-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .column-modal .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .column-modal .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
+        .column-modal .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .footer-actions { display: flex; gap: 8px; }
+        .column-list { display: flex; flex-direction: column; gap: 2px; max-height: 350px; overflow-y: auto; }
+        .column-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; font-size: 13px; border-radius: var(--radius-sm); transition: background 0.15s; }
+        .column-item:hover { background: var(--bg); }
+        .column-item input { width: 16px; height: 16px; accent-color: var(--primary); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
+
+    <!-- Drawer Overlay -->
+    <div class="modal-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+    <!-- WO Info Drawer -->
+    <div class="drawer" id="woInfoDrawer">
+        <div class="drawer-header">
+            <h3>M1_1 WO工单信息表</h3>
+            <button class="modal-close" onclick="closeDrawer()">×</button>
+        </div>
+        <div class="drawer-body">
+            <div class="query-bar">
+                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <div class="query-item"><span class="query-label">料号</span><input type="text" id="q_materialCode" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">工单号</span><input type="text" id="q_workOrderNo" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">工单类型</span><select id="q_workOrderCategory"><option value="">全部</option><option>STD</option><option>EXPRESS</option><option>SPECIAL</option></select></div>
+                <div class="query-item"><span class="query-label">工单状态</span><select id="q_workOrderStatus"><option value="">全部</option><option>已发放</option><option>未发放</option><option>进行中</option><option>完工</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="doSearch()">🔍 查询</button>
+                <button class="btn btn-sm" onclick="resetQuery()">↺ 重置</button>
+                <div style="margin-left:auto; display:flex; gap:8px;">
+                    <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
+                    <button class="btn btn-sm" onclick="exportData()">📥 导出</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <div class="table-scroll">
+                        <table class="data-table" id="dataTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table>
+                    </div>
+                    <div class="table-footer">
+                        <div>共 <strong id="totalCount">0</strong> 条记录</div>
+                        <div>每页 <select id="pageSizeSelect" onchange="changePageSize()" style="height:26px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 6px;font-size:12px;"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option></select> 条</div>
+                        <div class="pagination">
+                            <button class="btn btn-sm" onclick="prevPage()">◀ 上一页</button>
+                            <span class="page-info"><span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                            <button class="btn btn-sm" onclick="nextPage()">下一页 ▶</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--自定义列弹窗 -->
+    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
+    <div class="column-modal" id="columnModal">
+        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
+        <div class="modal-body"><div class="column-list" id="columnList"></div></div>
+        <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
+    </div>
+
+    <script>
+        // SPEC.md M1_1 - WO工单信息表 - 27个字段
+        var fieldDefs = [
+            {field:'seqNo',name:'序号',visible:true,systemFixed:true},
+            {field:'orgName',name:'组织',visible:true},
+            {field:'materialCode',name:'料号',visible:true},
+            {field:'materialDes',name:'物料描述',visible:true},
+            {field:'workOrderNo',name:'工单号',visible:true,leftSticky:true},
+            {field:'workOrderType',name:'工单类型',visible:true},
+            {field:'workOrderStatus',name:'工单状态',visible:true},
+            {field:'workOrderPriority',name:'工单优先级',visible:false},
+            {field:'transferBy',name:'转单人',visible:false},
+            {field:'transferTime',name:'转单时间',visible:false},
+            {field:'transferQty',name:'转单数量',visible:false},
+            {field:'completedQty',name:'已完工数量',visible:false},
+            {field:'scrapQty',name:'报废数量',visible:false},
+            {field:'incompleteQty',name:'未完成数量',visible:false},
+            {field:'supplierCode',name:'供应商编码',visible:false},
+            {field:'supplierDesc',name:'供应商简称',visible:false},
+            {field:'requiredMaterialDate',name:'要求齐料日期',visible:false},
+            {field:'requiredCompletionDate',name:'要求完成日期',visible:true},
+            {field:'estimatedCompletionDate',name:'预计完成日期',visible:false},
+            {field:'actualCompletionDate',name:'实际完成日期',visible:false},
+            {field:'scheduledStartDate',name:'计划开工日期',visible:false},
+            {field:'actualStartDate',name:'实际开工日期',visible:false},
+            {field:'scheduledQty',name:'计划数量',visible:false},
+            {field:'issuedQty',name:'已发料数量',visible:true},
+            {field:'unIssuedQty',name:'未发料数量',visible:false},
+            {field:'unitUsage',name:'单位用量',visible:false},
+            {field:'remainingQty',name:'剩余数量',visible:true,rightSticky:true}
+        ];
+
+        var currentColumnConfig = fieldDefs.map(function(f){ Object.assign({},f);});
+        var allData, filteredData, currentPage, pageSize;
+        var sortField = '', sortDir = '';
+
+        function getUrlParam(name) {
+            var reg = new RegExp('(\\?|&)' + name + '=([^&]*)(&|$)');
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return decodeURIComponent(r[2]);
+            return null;
+        }
+
+        // Open drawer function
+        function openDrawer() {
+            document.getElementById('drawerOverlay').classList.add('show');
+            document.getElementById('woInfoDrawer').classList.add('show');
+        }
+
+        // Close drawer function
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('show');
+            document.getElementById('woInfoDrawer').classList.remove('show');
+        }
+
+        function init() {
+            pageSize = 50; currentPage = 1;
+            generateSampleData();
+            filteredData = allData.slice();
+            renderTable();
+            var mc = getUrlParam('materialCode');
+            var wo = getUrlParam('workOrderNo');
+            if (mc) document.getElementById('q_materialCode').value = mc;
+            if (wo) document.getElementById('q_workOrderNo').value = wo;
+            if (mc || wo) doSearch();
+
+            // Auto-open drawer when loaded directly
+            openDrawer();
+        }
+
+        function generateSampleData() {
+            var orgs = ['深圳工厂','上海工厂','北京工厂','成都工厂'];
+            var materials = [
+                {code:'MTR-1001',desc:'芯片封装-QFP128'},
+                {code:'MTR-1002',desc:'芯片封装-BGA256'},
+                {code:'MTR-2001',desc:'PCB主板-8层'},
+                {code:'MTR-2003',desc:'电源模块-DCDC'},
+                {code:'MTR-3001',desc:'连接器-HDMI'}
+            ];
+            var woTypes = ['STD','EXPRESS','SPECIAL'];
+            var woStatuses = ['已发放','未发放','进行中','完工'];
+            var users = ['张三','李四','王五','赵六','孙七'];
+            var suppliers = [
+                {code:'NJHT',desc:'南京华天'},
+                {code:'SZHT',desc:'深圳华天'},
+                {code:'SZZC',desc:'深圳长电'},
+                {code:'SHLC',desc:'上海力晶'},
+                {code:'SHTF',desc:'上海通富'},
+                {code:'BJSN',desc:'北京中芯'}
+            ];
+            allData = [];
+            for (var i = 1; i <= 50; i++) {
+                var org = orgs[Math.floor(Math.random()*orgs.length)];
+                var mat = materials[Math.floor(Math.random()*materials.length)];
+                var supplier = suppliers[Math.floor(Math.random()*suppliers.length)];
+                var woType = woTypes[Math.floor(Math.random()*woTypes.length)];
+                var woStatus = woStatuses[Math.floor(Math.random()*woStatuses.length)];
+                var transferQty = Math.floor(Math.random()*5000)+500;
+                var completedQty = Math.floor(Math.random()*transferQty*0.8);
+                var scrapQty = Math.floor(Math.random()*50);
+                var unitUsage = (Math.random()*10+0.1).toFixed(2);
+                var issuedQty = Math.floor(transferQty*Math.random()*0.9);
+                allData.push({
+                    seqNo: i,
+                    orgName: org,
+                    materialCode: mat.code,
+                    materialDes: mat.desc,
+                    workOrderNo: 'WO-2025-' + org.substring(0,1) + '-' + String(i).padStart(5,'0'),
+                    workOrderType: woType,
+                    workOrderStatus: woStatus,
+                    workOrderPriority: Math.floor(Math.random()*5)+1,
+                    transferBy: users[Math.floor(Math.random()*users.length)],
+                    transferTime: new Date(2025,Math.floor(Math.random()*6),Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    transferQty: String(transferQty),
+                    completedQty: String(completedQty),
+                    scrapQty: String(scrapQty),
+                    incompleteQty: String(transferQty - completedQty - scrapQty),
+                    supplierCode: supplier.code,
+                    supplierDesc: supplier.desc,
+                    requiredMaterialDate: new Date(2025,Math.floor(Math.random()*6)+3,Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    requiredCompletionDate: new Date(2025,Math.floor(Math.random()*6)+6,Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    estimatedCompletionDate: new Date(2025,Math.floor(Math.random()*6)+8,Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    actualCompletionDate: woStatus==='完工' ? new Date(2025,Math.floor(Math.random()*6)+8,Math.floor(Math.random()*28)+1).toISOString().split('T')[0] : '',
+                    scheduledStartDate: new Date(2025,Math.floor(Math.random()*6),Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    actualStartDate: new Date(2025,Math.floor(Math.random()*6),Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    scheduledQty: String(transferQty),
+                    issuedQty: String(issuedQty),
+                    unIssuedQty: String(transferQty - issuedQty),
+                    unitUsage: unitUsage,
+                    remainingQty: String(Math.floor(Math.random()*1000))
+                });
+            }
+        }
+
+        function buildHeaderHtml() {
+            var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
+            currentColumnConfig.forEach(function(c) {
+                if (!c.visible) return;
+                var cls = '';
+                if (c.leftSticky) cls = 'col-left-sticky';
+                else if (c.rightSticky) cls = 'col-right-sticky';
+                var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
+                var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
+                h += '<th class="'+cls+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
+            });
+            return h + '</tr>';
+        }
+
+        function sortBy(field) {
+            if (sortField === field) {
+                if (sortDir === 'asc') sortDir = 'desc';
+                else if (sortDir === 'desc') { sortDir = ''; sortField = ''; }
+            } else { sortField = field; sortDir = 'asc'; }
+            if (sortField) {
+                filteredData.sort(function(a, b) {
+                    var va = a[sortField], vb = b[sortField];
+                    if (va == null) va = ''; if (vb == null) vb = '';
+                    var na = parseFloat(va), nb = parseFloat(vb);
+                    if (!isNaN(na) && !isNaN(nb)) return sortDir === 'asc' ? na - nb : nb - na;
+                    va = String(va); vb = String(vb);
+                    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+                    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            currentPage = 1; renderTable();
+        }
+
+        function buildBodyHtml() {
+            var s = (currentPage-1)*pageSize, e = Math.min(s+pageSize, filteredData.length);
+            var h = '';
+            for (var i = s; i < e; i++) {
+                var d = filteredData[i];
+                h += '<tr data-idx="'+i+'"><td class="col-check"><input type="checkbox"></td>';
+                currentColumnConfig.forEach(function(c) {
+                    if (!c.visible) return;
+                    var tc = '';
+                    if (c.leftSticky) tc = 'col-left-sticky';
+                    else if (c.rightSticky) tc = 'col-right-sticky';
+                    var v = d[c.field];
+                    if (c.field==='workOrderStatus') {
+                        var stc = v==='完工'?'badge-success':(v==='进行中'?'badge-warning':'badge-danger');
+                        h += '<td class="'+tc+'"><span class="badge '+stc+'">'+(v||'')+'</span></td>';
+                    } else if (c.field==='workOrderType') {
+                        var catBadge = v==='STD'?'badge-success':(v==='EXPRESS'?'badge-danger':'badge-warning');
+                        h += '<td class="'+tc+'"><span class="badge '+catBadge+'">'+(v||'')+'</span></td>';
+                    } else {
+                        h += '<td class="'+tc+'">'+(v!==undefined && v!==null && v!==''?v:'-')+'</td>';
+                    }
+                });
+                h += '</tr>';
+            }
+            return h;
+        }
+
+        function renderTable() {
+            document.getElementById('tableHead').innerHTML = buildHeaderHtml();
+            document.getElementById('tableBody').innerHTML = buildBodyHtml();
+            document.getElementById('totalCount').textContent = filteredData.length;
+            document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/pageSize)||1;
+            document.getElementById('currentPage').textContent = currentPage;
+        }
+
+        function showToast(m) {
+            var t = document.getElementById('toast');
+            t.querySelector('.toast-message').textContent = m;
+            t.querySelector('.toast-icon').textContent = '✓';
+            t.className = 'toast success show';
+            setTimeout(function(){ t.classList.remove('show'); }, 2500);
+        }
+
+        function doSearch() {
+            var org = document.getElementById('q_orgName').value;
+            var mc = document.getElementById('q_materialCode').value.trim();
+            var wo = document.getElementById('q_workOrderNo').value.trim();
+            var wc = document.getElementById('q_workOrderCategory').value;
+            var ws = document.getElementById('q_workOrderStatus').value;
+            filteredData = allData.filter(function(d) {
+                if (org && d.orgName !== org) return false;
+                if (mc && d.materialCode.indexOf(mc) === -1) return false;
+                if (wo && d.workOrderNo.indexOf(wo) === -1) return false;
+                if (wc && d.workOrderType !== wc) return false;
+                if (ws && d.workOrderStatus !== ws) return false;
+                return true;
+            });
+            currentPage = 1; renderTable();
+            showToast('查询完成，共 ' + filteredData.length + ' 条记录');
+        }
+
+        function resetQuery() {
+            document.getElementById('q_orgName').value = '';
+            document.getElementById('q_materialCode').value = '';
+            document.getElementById('q_workOrderNo').value = '';
+            document.getElementById('q_workOrderCategory').value = '';
+            document.getElementById('q_workOrderStatus').value = '';
+            filteredData = allData.slice(); currentPage = 1; renderTable();
+            showToast('查询条件已重置');
+        }
+
+        function exportData() {
+            var vf = currentColumnConfig.filter(function(c){ return c.visible; });
+            var h = vf.map(function(c){ return c.name; }).join('\t') + '\n';
+            var csv = '\ufeff' + h;
+            filteredData.forEach(function(d) {
+                csv += vf.map(function(c) {
+                    var v = d[c.field];
+                    return v !== undefined && v !== null ? v : '';
+                }).join('\t') + '\n';
+            });
+            var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+            a.download = 'WO工单信息_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
+            showToast('导出成功');
+        }
+
+        function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
+        function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
+
+        function openColumnConfig() { renderColumnList(); document.getElementById('columnModal').classList.add('show'); document.getElementById('colOverlay').classList.add('show'); }
+        function closeColumnConfig() { document.getElementById('columnModal').classList.remove('show'); document.getElementById('colOverlay').classList.remove('show'); }
+        function renderColumnList() {
+            var h = '';
+            fieldDefs.forEach(function(f, i) {
+                var ck = currentColumnConfig[i] && currentColumnConfig[i].visible ? 'checked' : '';
+                h += '<label class="column-item"><input type="checkbox" '+ck+' onchange="toggleColVis('+i+',this.checked)"><span>'+f.name+'</span></label>';            });
+            document.getElementById('columnList').innerHTML = h;
+        }
+        function toggleColVis(i, v) { if (fieldDefs[i].systemFixed) return; if (currentColumnConfig[i]) currentColumnConfig[i].visible = v; renderTable(); }
+        function resetColumnConfig() { currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); }); renderColumnList(); renderTable(); showToast('已恢复默认列配置'); }
+        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用'); }
+
+        init();
+    </script>
+</body>
+</html>

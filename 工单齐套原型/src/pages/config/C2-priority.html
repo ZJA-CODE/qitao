@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C2 工单齐套优先级维护表</title>
+    <style>
+        :root {
+            --primary: #1677ff; --primary-hover: #4096ff; --primary-bg: #e6f4ff;
+            --success: #52c41a; --success-bg: #f6ffed; --success-border: #b7eb8f;
+            --warning: #fa8c16; --warning-bg: #fff7e6; --warning-border: #ffd591;
+            --danger: #ff4d4f; --danger-bg: #fff2f0; --danger-border: #ffccc7;
+            --border: #e8e8e8; --border-light: #f0f0f0;
+            --bg: #f5f7fa; --bg-white: #ffffff;
+            --text: #1f1f1f; --text-secondary: #595959; --text-muted: #8c8c8c;
+            --header-bg: #001529; --table-header: #fafafa; --table-hover: #f5f8ff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+            --radius: 6px; --radius-sm: 4px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
+        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
+        .tab-bar::-webkit-scrollbar { height: 0; }
+        .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
+        .tab-item:hover { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
+        .tab-item.active { background: #4285f4; color: #fff; border-color: #4285f4; }
+        .tab-close { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; opacity: 0.6; transition: all 0.15s; }
+        .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+        .tab-item.active .tab-close { opacity: 0.8; }
+        .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
+        .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
+        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
+        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+        .breadcrumb-bar a:hover { text-decoration: underline; }
+        .breadcrumb-sep { color: var(--text-muted); }
+        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
+        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
+        .toolbar-breadcrumb a:hover { text-decoration: underline; }
+        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
+        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
+        .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
+        .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+        .toolbar-query .query-item input,
+        .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
+        .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+        .toolbar-query .query-label.required::after { content: " *"; color: var(--danger); }
+        .query-bar { padding: 12px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; flex-shrink: 0; }
+        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .query-item input, .query-item select { height: 30px; min-width: 120px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
+        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .query-label { color: var(--text-secondary); white-space: nowrap; }
+        .stat-bar { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: var(--text-muted); }
+        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+        .btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-add { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-add:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-delete { background: var(--bg-white); border-color: var(--border); color: var(--text-secondary); }
+        .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+        .btn-link { background: transparent; border: none; color: var(--primary); padding: 4px 8px; height: auto; }
+        .btn-link:hover { background: var(--primary-bg); }
+        .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
+        .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
+        .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+        .table-scroll { flex: 1; min-height: 0; overflow: auto; }
+        .data-table { font-size: 13px; border-collapse: separate; border-spacing: 0; width: 100%; min-width: max-content; }
+        .data-table th, .data-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; white-space: nowrap; }
+        .data-table thead th { position: sticky; top: 0; z-index: 11; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--table-header); font-size: 12px; }
+        .data-table tbody tr:hover td { background: var(--table-hover); }
+        .col-check { width: 40px; text-align: center; position: sticky; left: 0; z-index: 6; background: var(--table-header); }
+        .data-table thead th.col-check { z-index: 14; }
+        .col-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .col-right-sticky { position: sticky; right: 0; z-index: 7; background: var(--bg-white); border-left: 1px solid var(--border); }
+        .data-table thead th.col-right-sticky { z-index: 14; background: var(--table-header); }
+        .th-sort { cursor: pointer; user-select: none; }
+        .th-sort:hover { background: var(--primary-bg); }
+        .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
+        .th-sort.asc .sort-icon, .th-sort.desc .sort-icon { opacity: 1; color: var(--primary); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+        .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
+        .link:hover { text-decoration: underline; }
+        .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
+        .pagination { display: flex; align-items: center; gap: 8px; }
+        .page-info { padding: 0 8px; }
+        .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        .toast-icon { font-size: 16px; }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
+        .modal-overlay.show { display: block; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; }
+        .modal.show { display: flex; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .modal-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--border-light); color: var(--text); }
+        .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
+        .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .footer-actions { display: flex; gap: 8px; }
+        .footer-hint { font-size: 12px; color: var(--text-muted); }
+        .sub-table { width: 100%; font-size: 13px; border-collapse: collapse; }
+        .sub-table th, .sub-table td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
+        .sub-table thead th { background: var(--table-header); font-weight: 600; position: sticky; top: 0; font-size: 12px; }
+        .sub-table tbody tr:hover td { background: var(--table-hover); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
+        <header class="app-header">
+        <div class="app-title">工单齐套管理系统</div>
+        <div class="tab-bar"></div>
+    </header>
+    <div class="page-container">
+        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">C2 优先级维护</span></span>                <div class="toolbar-actions">                    <button class="btn btn-sm btn-link" onclick="doAdd()">新增</button>                    <button class="btn btn-sm btn-link" onclick="doDelete()">删除</button>                    <button class="btn btn-sm btn-link" onclick="exportData()">导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label" style="color:var(--danger);">组织 *</span><select id="qOrgName"><option value="">请选择</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select>
+            </div>                <div class="query-item"><span class="query-label">工单号</span><input type="text" id="qWorkOrderNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">料号</span><input type="text" id="qMaterialCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">订单编号</span><input type="text" id="qOrderNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">订单类型</span><select id="qOrderType"><option value="">全部</option><option>标准订单</option><option>紧急订单</option><option>预测订单</option><option>补货订单</option></select></div>                <div class="query-item"><span class="query-label">工单优先级</span><input type="number" id="qWorkOrderPriority" placeholder="数值" style="min-width:80px;"></div>                <div class="query-item"><span class="query-label">要求完成日期</span><input type="date" id="qRequiredCompletionDate"></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="stat-bar">
+            <span>提示：工单优先级由人工维护，优先级数值越小优先级越高（1为最高）</span>
+            <div style="display:flex;gap:8px;margin-left:auto;align-items:center;">
+                <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button>
+                <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table class="data-table" id="dataTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table>
+                </div>
+                <div class="table-footer">
+                    <div>共 <strong id="totalCount">0</strong> 条记录</div>
+                    <div>每页 <select id="pageSizeSelect" onchange="changePageSize()" style="height:26px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 6px;font-size:12px;"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option></select> 条</div>
+                    <div class="pagination">
+                        <button class="btn btn-sm" onclick="prevPage()">◀ 上一页</button>
+                        <span class="page-info"><span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                        <button class="btn btn-sm" onclick="nextPage()">下一页 ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义列弹窗 -->
+    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
+    <div class="modal" id="columnModal" style="width:480px;">
+        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
+        <div class="modal-body">
+            <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">☑ 勾选显示的列</div>
+            <div style="display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto;" id="columnList"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeColumnConfig()">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 高级搜索弹窗 -->
+    <div class="modal-overlay" id="advOverlay" onclick="closeAdvSearch()"></div>
+    <div class="modal" id="advModal" style="width:720px;">
+        <div class="modal-header"><h3>🔍 高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
+        <div class="modal-body">
+            <div style="display:flex;flex-direction:column;gap:8px;" id="advConditionList"></div>
+            <button class="btn btn-sm" style="margin-top:12px;" onclick="addAdvCondition()">+ 添加条件</button>
+        </div>
+        <div class="modal-footer">
+            <div class="footer-hint">多个条件之间为 AND 关系</div>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeAdvSearch()">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">应用</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导出弹窗 -->
+    <div class="modal-overlay" id="exportOverlay" onclick="closeExportModal()"></div>
+    <div class="modal" id="exportModal" style="width:480px;">
+        <div class="modal-header"><h3>📥 导出工单优先级</h3><button class="modal-close" onclick="closeExportModal()">×</button></div>
+        <div class="modal-body">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">导出模板包含以下字段：</div>
+            <table class="sub-table" style="margin-bottom:12px;">
+                <thead><tr><th>字段名称</th><th>是否必填</th><th>说明</th></tr></thead>
+                <tbody>
+                    <tr><td>工单号</td><td><span class="badge badge-danger">必填</span></td><td>用于唯一标识工单</td></tr>
+                    <tr><td>工单优先级</td><td><span class="badge badge-success">选填</span></td><td>数值越小优先级越高</td></tr>
+                </tbody>
+            </table>
+            <div style="margin-bottom:8px;">
+                <label style="font-size:12px;color:var(--text-secondary);">导出范围：</label>
+                <select id="exportScope" style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;margin-left:8px;">
+                    <option value="filtered">当前查询结果</option>
+                    <option value="all">全部</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span class="footer-hint">导出文件格式为 CSV</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeExportModal()">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="doExport()">确认导出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入弹窗 -->
+    <div class="modal-overlay" id="importOverlay" onclick="closeImportModal()"></div>
+    <div class="modal" id="importModal" style="width:520px;">
+        <div class="modal-header"><h3>📤 导入工单优先级</h3><button class="modal-close" onclick="closeImportModal()">×</button></div>
+        <div class="modal-body">
+            <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;margin-bottom:12px;" onclick="document.getElementById('importFileInput').click()">
+                <div style="font-size:32px;margin-bottom:8px;">📁</div>
+                <div style="font-size:13px;color:var(--text-secondary);">点击或拖拽文件到此处上传</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">支持 .csv / .xls / .xlsx 格式</div>
+            </div>
+            <input type="file" id="importFileInput" accept=".csv,.xls,.xlsx" style="display:none;" onchange="handleFileSelect(this)">
+            <div id="importFileInfo" style="display:none;align-items:center;gap:8px;padding:10px;background:var(--success-bg);border-radius:var(--radius-sm);margin-top:8px;">
+                <span>📄</span>
+                <span id="selectedFileName" style="font-size:13px;color:var(--success);font-weight:500;"></span>
+                <span style="margin-left:auto;cursor:pointer;color:var(--danger);" onclick="clearSelectedFile()">✕</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <span class="footer-hint">导入后将覆盖原有优先级数据</span>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeImportModal()">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="doImport()">确认导入</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // C2 工单优先级字段定义
+        var c2FieldDefs = [
+            {field:'workOrderNo',name:'工单号',visible:true,systemFixed:true},
+            {field:'orgName',name:'组织',visible:true},
+            {field:'orderNo',name:'订单编号',visible:true},
+            {field:'orderType',name:'订单类型',visible:true},
+            {field:'materialCode',name:'料号',visible:true},
+            {field:'orderQty',name:'下单数量',visible:true},
+            {field:'requiredCompletionDate',name:'要求完成日期',visible:true},
+            {field:'workOrderStatus',name:'工单状态',visible:true},
+            {field:'workOrderPriority',name:'工单优先级',visible:true,editable:true,fixedRight:true},
+            {field:'createdBy',name:'创建人',visible:false},
+            {field:'createDate',name:'创建日期',visible:false},
+            {field:'updatedBy',name:'编辑人',visible:true},
+            {field:'updateDate',name:'编辑日期',visible:true},
+            {field:'operations',name:'操作',visible:true,isAction:true,fixedRight:true,systemFixed:true}
+        ];
+        
+        var currentColumnConfig = c2FieldDefs.map(function(f){return Object.assign({},f);});
+        var allData, filteredData, currentPage, pageSize;
+        var sortField = '', sortDir = '';
+        var selectedFile = null;
+        var advConditions = [];
+
+        // 初始化
+        function init() {
+            pageSize = 50; currentPage = 1;
+            generateSampleData();
+            filteredData = allData.slice();
+            renderTable();
+            initAdvConditions();
+        }
+
+        // 生成示例数据
+        function generateSampleData() {
+            var orgs = ['深圳工厂','上海工厂','北京工厂','成都工厂'];
+            var orderTypes = ['标准订单','紧急订单','预测订单','补货订单'];
+            var statuses = ['已发料','未发料','进行中','已完工'];
+            var users = ['张三','李四','王五','赵六'];
+            
+            allData = [];
+            for (var i = 1; i <= 25; i++) {
+                var now = new Date();
+                var reqDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + Math.floor(Math.random()*30)+1);
+                var cd = new Date(now.getFullYear(), now.getMonth()-Math.floor(Math.random()*2), Math.floor(Math.random()*28)+1);
+                
+                allData.push({
+                    workOrderNo: 'WO' + String(20260000 + i).padStart(8,'0'),
+                    orgName: orgs[Math.floor(Math.random()*orgs.length)],
+                    orderNo: 'ORD' + String(Math.floor(Math.random()*900000)+100000),
+                    orderType: orderTypes[Math.floor(Math.random()*orderTypes.length)],
+                    materialCode: 'MAT-' + String(Math.floor(Math.random()*9000)+1000),
+                    orderQty: Math.floor(Math.random()*500) + 50,
+                    requiredCompletionDate: reqDate.toISOString().split('T')[0],
+                    workOrderStatus: statuses[Math.floor(Math.random()*statuses.length)],
+                    workOrderPriority: Math.floor(Math.random()*10) + 1,
+                    createdBy: users[Math.floor(Math.random()*users.length)],
+                    createDate: cd.toISOString().split('T')[0],
+                    updatedBy: users[Math.floor(Math.random()*users.length)],
+                    updateDate: cd.toISOString().split('T')[0]
+                });
+            }
+            // 按优先级排序
+            allData.sort(function(a,b){ return a.workOrderPriority - b.workOrderPriority; });
+        }
+
+        // 排序功能
+        function sortBy(field) {
+            if (sortField === field) {
+                if (sortDir === 'asc') sortDir = 'desc';
+                else if (sortDir === 'desc') { sortDir = ''; sortField = ''; }
+            } else { sortField = field; sortDir = 'asc'; }
+            if (sortField) {
+                filteredData.sort(function(a, b) {
+                    var va = a[sortField], vb = b[sortField];
+                    if (va == null) va = ''; if (vb == null) vb = '';
+                    var na = parseFloat(va), nb = parseFloat(vb);
+                    if (!isNaN(na) && !isNaN(nb)) return sortDir === 'asc' ? na - nb : nb - na;
+                    va = String(va); vb = String(vb);
+                    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+                    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            currentPage = 1; renderTable();
+        }
+
+        // 构建表头
+        function buildHeaderHtml() {
+            var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
+            currentColumnConfig.forEach(function(c) {
+                if (c.field === 'operations') return;
+                if (!c.visible) return;
+                var cls = c.fixedRight ? 'col-right-sticky' : '';
+                var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
+                var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
+                h += '<th class="'+cls+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
+            });
+            return h + '<th class="col-right-sticky">操作</th></tr>';
+        }
+
+        // 构建表体
+        function buildBodyHtml() {
+            var s = (currentPage-1)*pageSize, e = Math.min(s+pageSize, filteredData.length);
+            var h = '';
+            for (var i = s; i < e; i++) {
+                var d = filteredData[i];
+                h += '<tr data-idx="'+i+'"><td class="col-check"><input type="checkbox"></td>';
+                currentColumnConfig.forEach(function(c) {
+                    if (c.field==='operations'||!c.visible) return;
+                    var tc = c.fixedRight ? 'col-right-sticky' : '';
+                    var v = d[c.field];
+                    if (c.editable && c.field==='workOrderPriority') {
+                        h += '<td class="'+tc+'"><input class="inline-input" type="number" value="'+(v||'')+'" onchange="updateField('+i+',\'workOrderPriority\',this.value)" style="width:60px;"></td>';
+                    } else {
+                        h += '<td class="'+tc+'">'+(v!==undefined?v:'')+'</td>';
+                    }
+                });
+                h += '<td class="col-right-sticky"><a class="link" onclick="saveRow('+i+')">💾 保存</a></td></tr>';
+            }
+            return h;
+        }
+
+        // 渲染表格
+        function renderTable() {
+            document.getElementById('tableHead').innerHTML = buildHeaderHtml();
+            document.getElementById('tableBody').innerHTML = buildBodyHtml();
+            document.getElementById('totalCount').textContent = filteredData.length;
+            document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/pageSize)||1;
+            document.getElementById('currentPage').textContent = currentPage;
+        }
+
+        // 数据操作
+        function updateField(i,f,v) { 
+            if(filteredData[i]) filteredData[i][f]=v; 
+            if(allData[i]) allData[i][f]=v; 
+        }
+        
+        function saveRow(i) {
+            var now = new Date().toISOString().split('T')[0];
+            if(filteredData[i]) { filteredData[i].updatedBy = '当前用户'; filteredData[i].updateDate = now; }
+            if(allData[i]) { allData[i].updatedBy = '当前用户'; allData[i].updateDate = now; }
+            showToast('工单 '+filteredData[i].workOrderNo+' 优先级已保存','success');
+            renderTable();
+        }
+
+        function saveAllData() {
+            var now = new Date().toISOString().split('T')[0];
+            allData.forEach(function(d){
+                d.updatedBy = '当前用户';
+                d.updateDate = now;
+            });
+            showToast('所有数据已保存，共 '+allData.length+' 条记录','success');
+            renderTable();
+        }
+
+        // 查询功能
+        function doSearch() {
+            var org = document.getElementById('qOrgName').value;
+            var wo = document.getElementById('qWorkOrderNo').value.trim();
+            var mat = document.getElementById('qMaterialCode').value.trim();
+            var ord = document.getElementById('qOrderNo').value.trim();
+            var ot = document.getElementById('qOrderType').value;
+            var pr = document.getElementById('qWorkOrderPriority').value;
+            var rcd = document.getElementById('qRequiredCompletionDate').value;
+            
+            filteredData = allData.filter(function(d) {
+                if (org && d.orgName !== org) return false;
+                if (wo && d.workOrderNo.indexOf(wo) === -1) return false;
+                if (mat && d.materialCode.indexOf(mat) === -1) return false;
+                if (ord && d.orderNo.indexOf(ord) === -1) return false;
+                if (ot && d.orderType !== ot) return false;
+                if (pr && String(d.workOrderPriority) !== pr) return false;
+                if (rcd && d.requiredCompletionDate !== rcd) return false;
+                return true;
+            });
+            currentPage = 1; renderTable();
+            showToast('查询完成，共 ' + filteredData.length + ' 条记录', 'success');
+        }
+
+        function resetQuery() {
+            document.getElementById('qOrgName').value = '';
+            document.getElementById('qWorkOrderNo').value = '';
+            document.getElementById('qMaterialCode').value = '';
+            document.getElementById('qOrderNo').value = '';
+            document.getElementById('qOrderType').value = '';
+            document.getElementById('qWorkOrderPriority').value = '';
+            document.getElementById('qRequiredCompletionDate').value = '';
+            filteredData = allData.slice(); currentPage = 1; renderTable();
+            showToast('查询条件已重置', 'success');
+        }
+
+        // 分页功能
+        function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
+        function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
+
+        // ===== 自定义列功能 =====
+        function openColumnConfig() {
+            renderColumnList();
+            document.getElementById('columnModal').classList.add('show');
+            document.getElementById('colOverlay').classList.add('show');
+        }
+        function closeColumnConfig() {
+            document.getElementById('columnModal').classList.remove('show');
+            document.getElementById('colOverlay').classList.remove('show');
+        }
+        function renderColumnList() {
+            var h = '';
+            currentColumnConfig.forEach(function(c, i) {
+                var disabled = c.systemFixed ? 'disabled' : '';
+                var checked = c.visible ? 'checked' : '';
+                var style = c.systemFixed ? 'color:var(--text-muted);' : '';
+                h += '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-radius:var(--radius-sm);'+style+'" onclick="return false;">' +
+                     '<input type="checkbox" '+checked+' '+disabled+' onchange="toggleColumn('+i+',this.checked)"> ' +
+                     (c.systemFixed ? '<span style="color:var(--danger);font-size:11px;">*</span>' : '') +
+                     c.name + '</label>';
+            });
+            document.getElementById('columnList').innerHTML = h;
+        }
+        function toggleColumn(idx, val) { currentColumnConfig[idx].visible = val; }
+        function resetColumnConfig() { currentColumnConfig = c2FieldDefs.map(function(f){return Object.assign({},f);}); renderColumnList(); }
+        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用','success'); }
+
+        // ===== 高级搜索功能 =====
+        function initAdvConditions() {
+            advConditions = [
+                {field:'workOrderNo',op:'contains',value:''},
+                {field:'materialCode',op:'contains',value:''}
+            ];
+        }
+        function openAdvSearch() {
+            renderAdvConditions();
+            document.getElementById('advModal').classList.add('show');
+            document.getElementById('advOverlay').classList.add('show');
+        }
+        function closeAdvSearch() {
+            document.getElementById('advModal').classList.remove('show');
+            document.getElementById('advOverlay').classList.remove('show');
+        }
+        function renderAdvConditions() {
+            var fields = c2FieldDefs.filter(function(f){return !f.isAction && f.field!=='operations';});
+            var h = '';
+            advConditions.forEach(function(c, i) {
+                h += '<div style="display:flex;gap:8px;align-items:center;">' +
+                     '<select style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" onchange="advConditions['+i+'].field=this.value">';
+                fields.forEach(function(f){ h += '<option value="'+f.field+'" '+(c.field===f.field?'selected':'')+'>'+f.name+'</option>'; });
+                h += '</select>' +
+                     '<select style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" onchange="advConditions['+i+'].op=this.value">' +
+                     '<option value="contains" '+(c.op==='contains'?'selected':'')+'>包含</option>' +
+                     '<option value="equals" '+(c.op==='equals'?'selected':'')+'>等于</option>' +
+                     '<option value="gt" '+(c.op==='gt'?'selected':'')+'>大于</option>' +
+                     '<option value="lt" '+(c.op==='lt'?'selected':'')+'>小于</option>' +
+                     '</select>' +
+                     '<input type="text" style="flex:1;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" value="'+c.value+'" placeholder="输入值" onchange="advConditions['+i+'].value=this.value">' +
+                     (i > 0 ? '<button class="btn btn-sm" style="height:26px;padding:0 8px;color:var(--danger);" onclick="removeAdvCondition('+i+')">×</button>' : '') +
+                     '</div>';
+            });
+            document.getElementById('advConditionList').innerHTML = h;
+        }
+        function addAdvCondition() {
+            advConditions.push({field:'workOrderNo',op:'contains',value:''});
+            renderAdvConditions();
+        }
+        function removeAdvCondition(i) {
+            advConditions.splice(i, 1);
+            renderAdvConditions();
+        }
+        function applyAdvSearch() {
+            filteredData = allData.filter(function(d) {
+                return advConditions.every(function(c) {
+                    if (!c.value) return true;
+                    var v = String(d[c.field]||'');
+                    var val = c.value;
+                    switch(c.op) {
+                        case 'contains': return v.indexOf(val) !== -1;
+                        case 'equals': return v === val;
+                        case 'gt': return parseFloat(d[c.field]) > parseFloat(val);
+                        case 'lt': return parseFloat(d[c.field]) < parseFloat(val);
+                        default: return true;
+                    }
+                });
+            });
+            currentPage = 1; renderTable(); closeAdvSearch();
+            showToast('高级搜索完成，共 ' + filteredData.length + ' 条记录', 'success');
+        }
+
+        // ===== 导入功能 =====
+        function openImportModal() {
+            selectedFile = null;
+            document.getElementById('importFileInfo').style.display = 'none';
+            document.getElementById('importModal').classList.add('show');
+            document.getElementById('importOverlay').classList.add('show');
+        }
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('show');
+            document.getElementById('importOverlay').classList.remove('show');
+        }
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                selectedFile = input.files[0];
+                document.getElementById('selectedFileName').textContent = selectedFile.name;
+                document.getElementById('importFileInfo').style.display = 'flex';
+            }
+        }
+        function clearSelectedFile() {
+            selectedFile = null;
+            document.getElementById('importFileInput').value = '';
+            document.getElementById('importFileInfo').style.display = 'none';
+        }
+        function doImport() {
+            if (!selectedFile) {
+                showToast('请先选择文件', 'error');
+                return;
+            }
+            showToast('导入功能演示：' + selectedFile.name, 'success');
+            closeImportModal();
+        }
+
+        // ===== 导出功能 =====
+        function openExportModal() {
+            document.getElementById('exportModal').classList.add('show');
+            document.getElementById('exportOverlay').classList.add('show');
+        }
+        function closeExportModal() {
+            document.getElementById('exportModal').classList.remove('show');
+            document.getElementById('exportOverlay').classList.remove('show');
+        }
+        function doExport() {
+            var scope = document.getElementById('exportScope').value;
+            var dataToExport = scope === 'filtered' ? filteredData : allData;
+            
+            var csv = '\ufeff工单号\t工单优先级';
+            dataToExport.forEach(function(d) {
+                csv += d.workOrderNo + '\t' + d.workOrderPriority + '';
+            });
+            
+            var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = '工单优先级_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            
+            showToast('导出成功，共 ' + dataToExport.length + ' 条记录', 'success');
+            closeExportModal();
+        }
+
+        // ===== Toast提示 =====
+        function showToast(m, tp) {
+            var t = document.getElementById('toast');
+            t.querySelector('.toast-message').textContent = m;
+            t.querySelector('.toast-icon').textContent = tp === 'success' ? '✓' : '✕';
+            t.className = 'toast ' + tp + ' show';
+            setTimeout(function(){ t.classList.remove('show'); }, 2500);
+        }
+
+        init();
+    </script>
+</body>
+</html>

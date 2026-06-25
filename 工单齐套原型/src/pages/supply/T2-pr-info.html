@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T2 PR信息表</title>
+    <style>
+        :root { --primary: #1677ff; --primary-hover: #4096ff; --primary-bg: #e6f4ff; --success: #52c41a; --success-bg: #f6ffed; --success-border: #b7eb8f; --warning: #fa8c16; --warning-bg: #fff7e6; --warning-border: #ffd591; --danger: #ff4d4f; --danger-bg: #fff2f0; --danger-border: #ffccc7; --border: #e8e8e8; --border-light: #f0f0f0; --bg: #f5f7fa; --bg-white: #ffffff; --text: #1f1f1f; --text-secondary: #595959; --text-muted: #8c8c8c; --header-bg: #001529; --table-header: #fafafa; --table-hover: #f5f8ff; --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-lg: 0 4px 20px rgba(0,0,0,0.12); --radius: 6px; --radius-sm: 4px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
+        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
+        .tab-bar::-webkit-scrollbar { height: 0; }
+        .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
+        .tab-item:hover { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
+        .tab-item.active { background: #4285f4; color: #fff; border-color: #4285f4; }
+        .tab-close { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; opacity: 0.6; transition: all 0.15s; }
+        .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+        .tab-item.active .tab-close { opacity: 0.8; }
+        .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
+        .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
+        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
+        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+        .breadcrumb-bar a:hover { text-decoration: underline; }
+        .breadcrumb-sep { color: var(--text-muted); }
+        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
+        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
+        .toolbar-breadcrumb a:hover { text-decoration: underline; }
+        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
+        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
+        .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
+        .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+        .toolbar-query .query-item input,
+        .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
+        .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+        .toolbar-query .query-label.required::after { content: " *"; color: var(--danger); }
+        .query-bar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0; }
+        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .query-item input, .query-item select { height: 30px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; }
+        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .query-label { color: var(--text-secondary); white-space: nowrap; }
+        .stat-cards { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .stat-cards .stat-tools { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+        .stat-tool-btn { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-white); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+        .stat-tool-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; white-space: nowrap; }
+        .btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
+        .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
+        .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+        .table-scroll { flex: 1; min-height: 0; overflow: auto; }
+        .data-table { font-size: 13px; border-collapse: separate; border-spacing: 0; width: 100%; min-width: max-content; }
+        .data-table th, .data-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; white-space: nowrap; }
+        .data-table thead th { position: sticky; top: 0; z-index: 11; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--table-header); font-size: 12px; }
+        .data-table tbody tr:hover td { background: var(--table-hover); }
+        .col-check { width: 40px; text-align: center; position: sticky; left: 0; z-index: 6; background: var(--table-header); }
+        .data-table thead th.col-check { z-index: 14; }
+        .col-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .col-left-sticky { position: sticky; left: 40px; z-index: 6; min-width: 140px; background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-left-sticky { z-index: 13; background: var(--table-header); }
+        .col-right-sticky { position: sticky; right: 0; z-index: 7; min-width: 100px; border-left: 1px solid var(--border); background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-right-sticky { z-index: 14; background: var(--table-header); border-left: 1px solid var(--border); }
+        .th-sort { cursor: pointer; user-select: none; }
+        .th-sort:hover { background: var(--primary-bg); }
+        .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
+        .th-sort.asc .sort-icon, .th-sort.desc .sort-icon { opacity: 1; color: var(--primary); }
+        .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
+        .link:hover { text-decoration: underline; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+        .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
+        .pagination { display: flex; align-items: center; gap: 8px; }
+        .page-info { padding: 0 8px; }
+        .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast-icon { font-size: 16px; color: var(--success); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
+        .modal-overlay.show { display: block; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; }
+        .modal.show { display: flex; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .modal-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
+        .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .footer-actions { display: flex; gap: 8px; }
+        .column-list { display: flex; flex-direction: column; gap: 2px; max-height: 400px; overflow-y: auto; }
+        .column-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; font-size: 13px; border-radius: var(--radius-sm); }
+        .column-item:hover { background: var(--bg); }
+        .column-item input { width: 16px; height: 16px; accent-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"><span class="toast-icon">✓</span><span class="toast-message"></span></div>
+        <header class="app-header">
+        <div class="app-title">工单齐套管理系统</div>
+        <div class="tab-bar"></div>
+    </header>
+    <div class="page-container">
+        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">T2 PR信息表</span></span>                <div class="toolbar-actions">                    <button class="btn btn-sm btn-link" onclick="exportData()">导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select>
+            </div>                <div class="query-item"><span class="query-label">PR单号</span><input type="text" id="q_prNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">料号</span><input type="text" id="q_materialCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">供应商编码</span><input type="text" id="q_supplierCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">需求日期</span><input type="date" id="q_requiredDate"></div>                <div class="query-item"><span class="query-label">PR状态</span><select id="q_prStatus"><option value="">全部</option><option>待审批</option><option>已审批</option><option>已转PO</option><option>已关闭</option></select></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="stat-cards">
+            <div class="stat-tools">
+                <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
+            </div>
+        </div>
+        <div class="table-container">
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table class="data-table"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table>
+                </div>
+                <div class="table-footer">
+                    <div>共 <strong id="totalCount">0</strong> 条记录</div>
+                    <div>每页 <select id="pageSizeSelect" onchange="changePageSize()" style="height:26px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 6px;font-size:12px;"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option></select> 条</div>
+                    <div class="pagination">
+                        <button class="btn btn-sm" onclick="prevPage()">◀ 上一页</button>
+                        <span class="page-info"><span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                        <button class="btn btn-sm" onclick="nextPage()">下一页 ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
+    <div class="modal" id="columnModal" style="width:480px;">
+        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
+        <div class="modal-body"><div class="column-list" id="columnList"></div></div>
+        <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
+    </div>
+    <script>
+        // SPEC.md T2 - PR信息表 - 20个字段
+        var fieldDefs = [
+            {field:'seqNo',name:'序号',visible:true,systemFixed:true},
+            {field:'orgName',name:'组织',visible:true},
+            {field:'prNo',name:'PR单号',visible:true,leftSticky:true},
+            {field:'prLineNo',name:'PR行号',visible:true},
+            {field:'materialCode',name:'料号',visible:true},
+            {field:'materialDes',name:'物料描述',visible:true},
+            {field:'supplierCode',name:'供应商编码',visible:true},
+            {field:'supplierDes',name:'供应商简称',visible:true},
+            {field:'prQty',name:'PR数量',visible:true},
+            {field:'unitPrice',name:'单价',visible:false},
+            {field:'amount',name:'金额',visible:false},
+            {field:'unit',name:'单位',visible:false},
+            {field:'requiredDate',name:'需求日期',visible:true},
+            {field:'promisedDate',name:'承诺日期',visible:false},
+            {field:'prStatus',name:'PR状态',visible:true},
+            {field:'buyer',name:'采购员',visible:false},
+            {field:'requester',name:'请购人',visible:false},
+            {field:'requestDept',name:'请购部门',visible:false},
+            {field:'createDate',name:'创建日期',visible:false}
+        ];
+        var currentColumnConfig = fieldDefs.map(function(f){return Object.assign({},f);});
+        var allData, filteredData, currentPage, pageSize;
+        var sortField = '', sortDir = '';
+        function init() { pageSize = 50; currentPage = 1; generateSampleData(); filteredData = allData.slice(); renderTable(); }
+        function generateSampleData() {
+            var orgs = ['深圳工厂','上海工厂','北京工厂','成都工厂'];
+            var materials = [{code:'MTR-1001',desc:'芯片封装-QFP128'},{code:'MTR-1002',desc:'芯片封装-BGA256'},{code:'MTR-2001',desc:'PCB主板-8层'},{code:'MTR-2003',desc:'电源模块-DCDC'},{code:'MTR-3001',desc:'连接器-HDMI'}];
+            var suppliers = [{code:'NJHT',des:'南京华天'},{code:'SZHT',des:'深圳华天'},{code:'SZZC',des:'深圳长电'},{code:'SHLC',des:'上海力晶'},{code:'SHTF',des:'上海通富'},{code:'BJSN',des:'北京中芯'}];
+            var statuses = ['待审批','已审批','已转PO','已关闭'];
+            var buyers = ['张采购','李采购','王采购','赵采购'];
+            var depts = ['研发部','生产部','品质部','工程部'];
+            allData = [];
+            for (var i = 1; i <= 80; i++) {
+                var org = orgs[Math.floor(Math.random()*orgs.length)];
+                var mat = materials[Math.floor(Math.random()*materials.length)];
+                var supplier = suppliers[Math.floor(Math.random()*suppliers.length)];
+                var status = statuses[Math.floor(Math.random()*statuses.length)];
+                var prQty = Math.floor(Math.random()*3000)+200;
+                allData.push({
+                    seqNo: i, orgName: org,
+                    prNo: 'PR-2025-' + String(i).padStart(6,'0'),
+                    prLineNo: String(Math.floor(Math.random()*5)+1),
+                    materialCode: mat.code, materialDes: mat.desc,
+                    supplierCode: supplier.code, supplierDes: supplier.des,
+                    prQty: String(prQty), unitPrice: String((Math.random()*50+10).toFixed(2)),
+                    amount: String((prQty * (Math.random()*50+10)).toFixed(2)), unit: 'PCS',
+                    requiredDate: new Date(2025,Math.floor(Math.random()*6)+2,Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    promisedDate: new Date(2025,Math.floor(Math.random()*6)+3,Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    prStatus: status, buyer: buyers[Math.floor(Math.random()*buyers.length)],
+                    requester: '员工' + String(i%50+1), requestDept: depts[Math.floor(Math.random()*depts.length)],
+                    createDate: new Date(2025,Math.floor(Math.random()*3),Math.floor(Math.random()*28)+1).toISOString().split('T')[0]
+                });
+            }
+        }
+        function buildHeaderHtml() {
+            var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
+            currentColumnConfig.forEach(function(c) {
+                if (!c.visible) return;
+                var cls = c.leftSticky ? 'col-left-sticky' : (c.rightSticky ? 'col-right-sticky' : '');
+                var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
+                var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
+                h += '<th class="'+cls+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
+            });
+            return h + '</tr>';
+        }
+        function sortBy(field) {
+            if (sortField === field) { if (sortDir === 'asc') sortDir = 'desc'; else if (sortDir === 'desc') { sortDir = ''; sortField = ''; } }
+            else { sortField = field; sortDir = 'asc'; }
+            if (sortField) {
+                filteredData.sort(function(a, b) {
+                    var va = a[sortField], vb = b[sortField];
+                    if (va == null) va = ''; if (vb == null) vb = '';
+                    var na = parseFloat(va), nb = parseFloat(vb);
+                    if (!isNaN(na) && !isNaN(nb)) return sortDir === 'asc' ? na - nb : nb - na;
+                    va = String(va); vb = String(vb);
+                    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+                    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            currentPage = 1; renderTable();
+        }
+        function buildBodyHtml() {
+            var s = (currentPage-1)*pageSize, e = Math.min(s+pageSize, filteredData.length);
+            var h = '';
+            for (var i = s; i < e; i++) {
+                var d = filteredData[i];
+                h += '<tr><td class="col-check"><input type="checkbox"></td>';
+                currentColumnConfig.forEach(function(c) {
+                    if (!c.visible) return;
+                    var tc = c.leftSticky ? 'col-left-sticky' : (c.rightSticky ? 'col-right-sticky' : '');
+                    var v = d[c.field];
+                    if (c.field==='prStatus') {
+                        var stc = v==='已转PO'?'badge-success':(v==='已审批'?'badge-warning':'badge-danger');
+                        h += '<td class="'+tc+'"><span class="badge '+stc+'">'+(v||'')+'</span></td>';
+                    } else {
+                        h += '<td class="'+tc+'">'+(v!==undefined && v!==null && v!==''?v:'-')+'</td>';
+                    }
+                });
+                h += '</tr>';
+            }
+            return h;
+        }
+        function renderTable() {
+            document.getElementById('tableHead').innerHTML = buildHeaderHtml();
+            document.getElementById('tableBody').innerHTML = buildBodyHtml();
+            document.getElementById('totalCount').textContent = filteredData.length;
+            document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/pageSize)||1;
+            document.getElementById('currentPage').textContent = currentPage;
+        }
+        function showToast(m) {
+            var t = document.getElementById('toast');
+            t.querySelector('.toast-message').textContent = m;
+            t.className = 'toast success show';
+            setTimeout(function(){ t.classList.remove('show'); }, 2500);
+        }
+        function doSearch() {
+            var org = document.getElementById('q_orgName').value;
+            var pr = document.getElementById('q_prNo').value.trim();
+            var mc = document.getElementById('q_materialCode').value.trim();
+            var sc = document.getElementById('q_supplierCode').value.trim();
+            var rd = document.getElementById('q_requiredDate').value;
+            var st = document.getElementById('q_prStatus').value;
+            filteredData = allData.filter(function(d) {
+                if (org && d.orgName !== org) return false;
+                if (pr && d.prNo.indexOf(pr) === -1) return false;
+                if (mc && d.materialCode.indexOf(mc) === -1) return false;
+                if (sc && d.supplierCode.indexOf(sc) === -1) return false;
+                if (rd && d.requiredDate.indexOf(rd) === -1) return false;
+                if (st && d.prStatus !== st) return false;
+                return true;
+            });
+            currentPage = 1; renderTable();
+            showToast('查询完成，共 ' + filteredData.length + ' 条记录');
+        }
+        function resetQuery() {
+            ['q_orgName','q_prNo','q_materialCode','q_supplierCode','q_requiredDate','q_prStatus'].forEach(function(id){ document.getElementById(id).value = ''; });
+            filteredData = allData.slice(); currentPage = 1; renderTable();
+            showToast('查询条件已重置');
+        }
+        function exportData() {
+            var vf = currentColumnConfig.filter(function(c){ return c.visible && c.field !== 'operations'; });
+            var csv = '\ufeff' + vf.map(function(c){ return c.name; }).join('\t') + '';
+            filteredData.forEach(function(d) { csv += vf.map(function(c) { var v = d[c.field]; return v !== undefined && v !== null ? v : ''; }).join('\t') + ''; });
+            var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+            a.download = 'PR信息表_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
+            showToast('导出成功');
+        }
+        function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
+        function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
+        function openColumnConfig() { renderColumnList(); document.getElementById('columnModal').classList.add('show'); document.getElementById('colOverlay').classList.add('show'); }
+        function closeColumnConfig() { document.getElementById('columnModal').classList.remove('show'); document.getElementById('colOverlay').classList.remove('show'); }
+        function renderColumnList() {
+            var h = '';
+            fieldDefs.forEach(function(f, i) {
+                var ck = currentColumnConfig[i] && currentColumnConfig[i].visible ? 'checked' : '';
+                h += '<label class="column-item"><input type="checkbox" '+ck+' onchange="toggleColVis('+i+',this.checked)"><span>'+f.name+'</span></label>';
+            });
+            document.getElementById('columnList').innerHTML = h;
+        }
+        function toggleColVis(i, v) { if (fieldDefs[i].systemFixed) return; if (currentColumnConfig[i]) currentColumnConfig[i].visible = v; renderTable(); }
+        function resetColumnConfig() { currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); }); renderColumnList(); renderTable(); showToast('已恢复默认列配置'); }
+        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用'); }
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M1 工单齐套明细</title>
+    <style>
+        :root {
+            --primary: #1677ff; --primary-hover: #4096ff; --primary-bg: #e6f4ff;
+            --success: #52c41a; --success-bg: #f6ffed; --success-border: #b7eb8f;
+            --warning: #fa8c16; --warning-bg: #fff7e6; --warning-border: #ffd591;
+            --danger: #ff4d4f; --danger-bg: #fff2f0; --danger-border: #ffccc7;
+            --border: #e8e8e8; --border-light: #f0f0f0;
+            --bg: #f5f7fa; --bg-white: #ffffff;
+            --text: #1f1f1f; --text-secondary: #595959; --text-muted: #8c8c8c;
+            --header-bg: #001529; --table-header: #fafafa; --table-hover: #f5f8ff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.08); --shadow-lg: 0 4px 20px rgba(0,0,0,0.12);
+            --radius: 6px; --radius-sm: 4px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
+        .app-header { height: 48px; background: var(--bg-white); border-bottom: 1px solid var(--border-light); display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 16px; font-weight: 700; color: #4285f4; letter-spacing: 1px; }
+        .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
+        .tab-bar::-webkit-scrollbar { height: 0; }
+        .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
+        .tab-item:hover { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
+        .tab-item.active { background: #4285f4; color: #fff; border-color: #4285f4; }
+        .tab-close { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; opacity: 0.6; transition: all 0.15s; }
+        .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+        .tab-item.active .tab-close { opacity: 0.8; }
+        .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
+        .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
+        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
+        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
+        .breadcrumb-bar a:hover { text-decoration: underline; }
+        .breadcrumb-sep { color: var(--text-muted); }
+        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
+        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
+        .toolbar-breadcrumb a:hover { text-decoration: underline; }
+        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
+        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
+        .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
+        .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+        .toolbar-query .query-item input,
+        .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
+        .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+        .toolbar-query .query-label.required::after { content: " *"; color: var(--danger); }
+        .query-bar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0; }
+        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .query-item input, .query-item select { height: 30px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
+        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .query-label { color: var(--text-secondary); white-space: nowrap; }
+        .query-label.required::before { content: '*'; color: var(--danger); margin-right: 2px; }
+        .stat-cards { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+        .stat-cards .stat-tools { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+        .stat-action-btns { display: flex; gap: 8px; padding-left: 10px; border-left: 1px solid var(--border); }
+        .stat-tool-btn { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-white); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; }
+        .stat-tool-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .stat-btn { background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 16px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 12px; font-weight: 500; height: 32px; transition: all 0.2s; }
+        .stat-btn:hover { border-color: var(--primary); background: var(--primary-bg); }
+        .stat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .stat-btn .stat-value { font-size: 16px; font-weight: 700; }
+        .stat-btn.stat-full .stat-value { color: var(--success); }
+        .stat-btn.stat-empty .stat-value { color: var(--danger); }
+        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+        .btn:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
+        .btn-success { background: var(--success); border-color: var(--success); color: white; }
+        .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
+        .btn-link { background: transparent; border: none; color: var(--primary); padding: 4px 8px; height: auto; font-weight: 500; }
+        .btn-link:hover { background: var(--primary-bg); }
+        .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
+        .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
+        .table-scroll { flex: 1; min-height: 0; overflow: auto; }
+        .data-table { font-size: 13px; border-collapse: separate; border-spacing: 0; width: 100%; min-width: max-content; }
+        .data-table th, .data-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; white-space: nowrap; }
+        .data-table thead th { position: sticky; top: 0; z-index: 11; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--table-header); font-size: 12px; }
+        .data-table tbody tr:hover td { background: var(--table-hover); }
+        .col-check { width: 40px; text-align: center; position: sticky; left: 0; z-index: 6; background: var(--table-header); }
+        .data-table thead th.col-check { z-index: 14; }
+        .col-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
+        .col-left-sticky { position: sticky; left: 40px; z-index: 6; min-width: 140px; background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-left-sticky { z-index: 13; background: var(--table-header); }
+        .col-supply-sticky { position: sticky; right: 140px; z-index: 6; min-width: 110px; border-left: 1px solid var(--border); background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-supply-sticky { z-index: 13; background: var(--table-header); border-left: 1px solid var(--border); }
+        .col-action-sticky { position: sticky; right: 0; z-index: 7; min-width: 140px; border-left: 1px solid var(--border); background: rgba(255,255,255,0.95); }
+        .data-table thead th.col-action-sticky { z-index: 14; background: var(--table-header); border-left: 1px solid var(--border); }
+        .th-sort { cursor: pointer; user-select: none; }
+        .th-sort:hover { background: var(--primary-bg); }
+        .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
+        .th-sort.asc .sort-icon, .th-sort.desc .sort-icon { opacity: 1; color: var(--primary); }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
+        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+        .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
+        .link:hover { text-decoration: underline; }
+        .supply-link { color: var(--warning); font-weight: 600; margin-right: 4px; cursor: pointer; }
+        .supply-link:hover { text-decoration: underline; }
+        .text-danger { color: var(--danger) !important; font-weight: 600; }
+        .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
+        .pagination { display: flex; align-items: center; gap: 8px; }
+        .page-info { padding: 0 8px; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
+        .modal-overlay.show { display: block; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; }
+        .modal.show { display: flex; }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+        .modal-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--border-light); color: var(--text); }
+        .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
+        .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
+        .footer-actions { display: flex; gap: 8px; }
+        .footer-hint { font-size: 12px; color: var(--text-muted); }
+        .column-list { display: flex; flex-direction: column; gap: 2px; max-height: 400px; overflow-y: auto; }
+        .column-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; font-size: 13px; border-radius: var(--radius-sm); transition: background 0.15s; }
+        .column-item:hover { background: var(--bg); }
+        .column-item input { width: 16px; height: 16px; accent-color: var(--primary); }
+        .condition-list { display: flex; flex-direction: column; gap: 8px; }
+        .condition-item { display: flex; gap: 8px; align-items: center; padding: 10px; background: var(--bg); border-radius: var(--radius-sm); }
+        .condition-item select, .condition-item input { height: 30px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; padding: 0 8px; }
+        .condition-item select.field-select { min-width: 140px; }
+        .condition-item select.op-select { min-width: 100px; }
+        .condition-item input { flex: 1; min-width: 120px; }
+        .condition-delete { width: 28px; height: 28px; border: none; background: transparent; color: var(--danger); cursor: pointer; font-size: 16px; border-radius: var(--radius-sm); }
+        .condition-delete:hover { background: var(--danger-bg); }
+        .drawer-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 1100; }
+        .drawer-overlay.show { display: block; }
+        .drawer { position: fixed; top: 0; right: 0; width: 60%; max-width: 800px; height: 100%; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 1101; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
+        .drawer.show { transform: translateX(0); }
+        .drawer-header { height: 48px; padding: 0 20px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+        .drawer-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .drawer-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .drawer-close:hover { background: var(--border-light); color: var(--text); }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+        .drawer-footer { height: 50px; padding: 0 20px; background: var(--bg); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section-title { font-size: 13px; font-weight: 600; padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .detail-item { display: flex; flex-direction: column; gap: 4px; }
+        .detail-label { font-size: 12px; color: var(--text-muted); }
+        .detail-value { font-size: 13px; color: var(--text); }
+        .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast-icon { font-size: 16px; }
+        .toast.success .toast-icon { color: var(--success); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
+        <header class="app-header">
+        <div class="app-title">工单齐套管理系统</div>
+        <div class="tab-bar"></div>
+    </header>
+    <div class="page-container">
+        <div class="unified-toolbar">
+            <div class="toolbar-row">
+                <span class="toolbar-breadcrumb"><a href="../../index.html">首页</a><span class="sep">/</span><span class="current">M1 工单齐套明细</span></span>
+            </div>
+            <div class="toolbar-query">
+                <div class="query-item"><span class="query-label required">配置编码</span><select id="q_configCode"><option value="">请选择</option><option>CFG-2025-00001</option><option>CFG-2025-00002</option></select></div>
+                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <div class="query-item"><span class="query-label">订单编号</span><input type="text" id="q_orderNo" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">订单类型</span><select id="q_orderType"><option value="">全部</option><option>标准订单</option><option>紧急订单</option><option>预测订单</option><option>补货订单</option></select></div>
+                <div class="query-item"><span class="query-label">料号</span><input type="text" id="q_materialCode" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">要求完成日期</span><input type="date" id="q_requiredCompletionDate"></div>
+                <div class="query-item"><span class="query-label">工单号</span><input type="text" id="q_workOrderNo" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">组件物料</span><input type="text" id="q_componentMaterialCode" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">组件责任方</span><input type="text" id="q_componentResponsibleParty" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">实际齐料日期</span><input type="date" id="q_actualMaterialReadyDate"></div>
+                <div class="query-item"><span class="query-label">是否齐套</span><select id="q_isKitComplete"><option value="">全部</option><option>是</option><option>否</option></select></div>
+                <button class="btn btn-primary btn-sm" onclick="doSearch()">🔍 查询</button>
+                <button class="btn btn-sm" onclick="resetQuery()">↺ 重置</button>
+            </div>
+        </div>
+        <div class="stat-cards">
+            <button class="stat-btn stat-full" id="statFull" onclick="filterByKit('full')"><span class="stat-value" id="statFullVal">0</span><span>齐套</span></button>
+            <button class="stat-btn stat-empty" id="statEmpty" onclick="filterByKit('empty')"><span class="stat-value" id="statEmptyVal">0</span><span>不齐套</span></button>
+            <div class="stat-tools">
+                <button class="stat-tool-btn" onclick="openAdvSearch()" title="高级搜索">🔍</button>
+                <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
+                <div class="stat-action-btns">
+                    <button class="btn btn-sm btn-link" onclick="showToast('列宽已重置','success')">重置列宽</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-container">
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table class="data-table" id="dataTable"><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table>
+                </div>
+                <div class="table-footer">
+                    <div>共 <strong id="totalCount">0</strong> 条记录</div>
+                    <div>每页 <select id="pageSizeSelect" onchange="changePageSize()" style="height:26px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 6px;font-size:12px;"><option value="20">20</option><option value="50" selected>50</option><option value="100">100</option></select> 条</div>
+                    <div class="pagination">
+                        <button class="btn btn-sm" onclick="prevPage()">◀ 上一页</button>
+                        <span class="page-info"><span id="currentPage">1</span> / <span id="totalPages">1</span></span>
+                        <button class="btn btn-sm" onclick="nextPage()">下一页 ▶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义列 -->
+    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
+    <div class="modal" id="columnModal" style="width:480px;">
+        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
+        <div class="modal-body"><div class="column-list" id="columnList"></div></div>
+        <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
+    </div>
+
+    <!-- 高级搜索 -->
+    <div class="modal-overlay" id="advOverlay" onclick="closeAdvSearch()"></div>
+    <div class="modal" id="advModal" style="width:720px;">
+        <div class="modal-header"><h3>🔍 高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
+        <div class="modal-body"><div class="condition-list" id="advConditionList"></div><button class="btn btn-sm" style="margin-top:12px;" onclick="addAdvCondition()">+ 添加条件</button></div>
+        <div class="modal-footer"><div class="footer-hint">多个条件之间为 AND 关系</div><div class="footer-actions"><button class="btn btn-sm" onclick="closeAdvSearch()">取消</button><button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">应用</button></div></div>
+    </div>
+
+    <!-- 右侧抽屉 -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="woDetailDrawer">
+        <div class="drawer-header"><span class="drawer-title">📋 工单详情</span><button class="drawer-close" onclick="closeDrawer()">×</button></div>
+        <div class="drawer-body" id="drawerBody"></div>
+        <div class="drawer-footer"><button class="btn btn-sm" onclick="closeDrawer()">关闭</button><button class="btn btn-primary btn-sm" onclick="showToast('已跳转','success')">查看详情</button></div>
+    </div>
+
+    <script>
+        // SPEC.md 屏幕9: M1 工单齐套明细 - 62个字段
+        var fieldDefs = [
+            {field:'seqNo',name:'序号',visible:true,systemFixed:true},
+            {field:'configCode',name:'配置编码',visible:true},
+            {field:'runTime',name:'运行时间',visible:true},
+            {field:'lastRunBy',name:'最后运行人',visible:false},
+            {field:'orgName',name:'组织',visible:true},
+            {field:'orderNo',name:'订单编号',visible:true},
+            {field:'orderCreateDate',name:'订单创建日期',visible:false},
+            {field:'orderCreator',name:'订单创建人',visible:false},
+            {field:'orderType',name:'订单类型',visible:true},
+            {field:'productLine',name:'产品线',visible:false},
+            {field:'materialCode',name:'料号',visible:true},
+            {field:'materialDes',name:'说明',visible:true},
+            {field:'dieStackQty',name:'叠die数',visible:false},
+            {field:'productCategory',name:'产品类别',visible:false},
+            {field:'capacity',name:'容量',visible:false},
+            {field:'productPn',name:'产品PN',visible:false},
+            {field:'orderQty',name:'下单数量',visible:true},
+            {field:'requiredCompletionDate',name:'要求完成日期',visible:true},
+            {field:'workOrderCategory',name:'工单分类',visible:false},
+            {field:'workOrderStatus',name:'工单状态',visible:true},
+            {field:'workOrderNo',name:'工单号',visible:true,leftSticky:true},
+            {field:'workOrderPriority',name:'工单优先级',visible:true},
+            {field:'transferBy',name:'转单人',visible:false},
+            {field:'transferTime',name:'转单时间',visible:false},
+            {field:'transferQty',name:'转单数量',visible:false},
+            {field:'completedQty',name:'已完工数量',visible:false},
+            {field:'scrapQty',name:'报废数量',visible:false},
+            {field:'incompleteQty',name:'未完成数量',visible:false},
+            {field:'supplierCode',name:'供应商编码',visible:false},
+            {field:'supplierDesc',name:'供应商简称',visible:true},
+            {field:'requiredMaterialDate',name:'要求齐料日期',visible:true},
+            {field:'componentMaterialCode',name:'组件物料',visible:true},
+            {field:'componentMaterialDesc',name:'组件物料描述',visible:false},
+            {field:'componentLeadTime',name:'LT',visible:false},
+            {field:'componentCategory',name:'零部件类别',visible:false},
+            {field:'componentType',name:'组件分类',visible:false},
+            {field:'componentResponsibleParty',name:'组件责任方',visible:true},
+            {field:'isResource',name:'是否资源',visible:false},
+            {field:'unitUsage',name:'单位用量',visible:false},
+            {field:'isRequired',name:'必需',visible:false},
+            {field:'yieldRate',name:'产出率',visible:false},
+            {field:'issuedQty',name:'已发料量',visible:false},
+            {field:'unIssuedQty',name:'未发料数量',visible:false},
+            {field:'availableQty',name:'可用量',visible:false},
+            {field:'onHandQty',name:'现存数量',visible:false},
+            {field:'issueWarehouse',name:'发料仓',visible:false},
+            {field:'configInventoryQty',name:'配置库存数量',visible:false},
+            {field:'woShortageQty',name:'工单缺料数量',visible:true},
+            {field:'availableStockShortageQty',name:'可用库存缺料数',visible:false},
+            {field:'theoreticalAvailableStock',name:'理论可用库存',visible:false},
+            {field:'theoreticalAvailableStockInclPoWo',name:'理论可用库存(含PO&工单)',visible:false},
+            {field:'committedKitQty',name:'已承诺物料齐套数',visible:false},
+            {field:'issuedKitQty',name:'已发料齐套数',visible:false},
+            {field:'committedSumQty',name:'工单当前齐套数',visible:false},
+            {field:'unKitQty',name:'未齐套数',visible:false},
+            {field:'estimatedMaterialReadyDate',name:'预计齐料日期',visible:false},
+            {field:'actualMaterialReadyDate',name:'实际齐料日期',visible:false},
+            {field:'hasAlternativeMaterial',name:'是否存在替代料',visible:false},
+            {field:'alternativeMaterialStock',name:'替代料及库存',visible:false},
+            {field:'isKitComplete',name:'是否齐套',visible:true},
+            {field:'supplyDetails',name:'供给明细',visible:true,supplySticky:true},
+            {field:'operations',name:'操作',visible:true,actionSticky:true,systemFixed:true}
+        ];
+
+        var currentColumnConfig = fieldDefs.map(function(f){return Object.assign({},f);});
+        var allData, filteredData, currentPage, pageSize;
+        var sortField = '', sortDir = '';
+
+        function init() {
+            pageSize = 50; currentPage = 1;
+            generateSampleData();
+            filteredData = allData.slice();
+            updateStats();
+            renderTable();
+        }
+
+        function generateSampleData() {
+            var orgs = ['深圳工厂','上海工厂','北京工厂','成都工厂'];
+            var orderTypes = ['标准订单','紧急订单','预测订单','补货订单'];
+            var woStatuses = ['已发放','未发放','进行中','完工'];
+            var suppliers = [
+                {code:'SUP-001',desc:'深圳华天科技'},{code:'SUP-002',desc:'深圳长电科技'},
+                {code:'SUP-004',desc:'上海力晶半导体'},{code:'SUP-005',desc:'上海通富微'},
+                {code:'SUP-006',desc:'北京中芯国际'}
+            ];
+            var materials = ['MTR-1001','MTR-1002','MTR-2001','MTR-2003','MTR-3001'];
+            var descs = ['芯片封装-QFP128','芯片封装-BGA256','PCB主板-8层','电源模块-DCDC','连接器-HDMI'];
+            var compMaterials = ['COMP-A001','COMP-A002','COMP-B001','COMP-B002','COMP-C001'];
+            var compDescs = ['IC主控芯片','电容-100uF','电阻-10K','晶振-25MHz','连接器-SM8P'];
+            var users = ['张三','李四','王五','赵六','孙七'];
+            allData = [];
+            for (var i = 1; i <= 42; i++) {
+                var org = orgs[Math.floor(Math.random()*orgs.length)];
+                var supplier = suppliers[Math.floor(Math.random()*suppliers.length)];
+                var matIdx = Math.floor(Math.random()*materials.length);
+                var compIdx = Math.floor(Math.random()*compMaterials.length);
+                var shortage = Math.floor(Math.random()*200) - 50;
+                var available = Math.floor(Math.random()*1000);
+                var kitStatus = shortage >= 0;
+                var rt = new Date(2025, Math.floor(Math.random()*6), Math.floor(Math.random()*28)+1);
+                allData.push({
+                    seqNo: i,
+                    configCode: 'CFG-2025-0000' + (Math.floor(Math.random()*3)+1),
+                    runTime: rt.toISOString().split('T')[0] + ' ' + String(Math.floor(Math.random()*24)).padStart(2,'0') + ':' + String(Math.floor(Math.random()*60)).padStart(2,'0'),
+                    lastRunBy: users[Math.floor(Math.random()*users.length)],
+                    orgName: org,
+                    orderNo: 'ORD-2025-' + String(Math.floor(Math.random()*9000)+1000),
+                    orderCreateDate: new Date(2025, Math.floor(Math.random()*6), Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    orderCreator: users[Math.floor(Math.random()*users.length)],
+                    orderType: orderTypes[Math.floor(Math.random()*orderTypes.length)],
+                    productLine: ['PL-A','PL-B','PL-C'][Math.floor(Math.random()*3)],
+                    materialCode: materials[matIdx],
+                    materialDes: descs[matIdx],
+                    dieStackQty: [4,8,16][Math.floor(Math.random()*3)],
+                    productCategory: ['A类','B类','C类'][Math.floor(Math.random()*3)],
+                    capacity: ['256GB','512GB','1TB'][Math.floor(Math.random()*3)],
+                    productPn: 'PN-' + String(Math.floor(Math.random()*9000)+1000),
+                    orderQty: String(Math.floor(Math.random()*9000)+1000),
+                    requiredCompletionDate: new Date(2025, Math.floor(Math.random()*6)+6, Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    workOrderCategory: ['STD','EXPRESS','SPECIAL'][Math.floor(Math.random()*3)],
+                    workOrderStatus: woStatuses[Math.floor(Math.random()*woStatuses.length)],
+                    workOrderNo: 'WO-2025-' + org.substring(0,1) + '-' + String(i).padStart(5,'0'),
+                    workOrderPriority: Math.floor(Math.random()*5)+1,
+                    transferBy: users[Math.floor(Math.random()*users.length)],
+                    transferTime: new Date(2025, Math.floor(Math.random()*6), Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    transferQty: String(Math.floor(Math.random()*500)),
+                    completedQty: String(Math.floor(Math.random()*3000)),
+                    scrapQty: String(Math.floor(Math.random()*50)),
+                    incompleteQty: String(Math.floor(Math.random()*5000)),
+                    supplierCode: supplier.code,
+                    supplierDesc: supplier.desc,
+                    requiredMaterialDate: new Date(2025, Math.floor(Math.random()*6)+3, Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    componentMaterialCode: compMaterials[compIdx],
+                    componentMaterialDesc: compDescs[compIdx],
+                    componentLeadTime: [7,14,21,30][Math.floor(Math.random()*4)],
+                    componentCategory: ['电子元器件','结构件','PCB','连接器'][Math.floor(Math.random()*4)],
+                    componentType: ['标准件','定制件','外购件'][Math.floor(Math.random()*3)],
+                    componentResponsibleParty: ['采购部','研发部','供应链'][Math.floor(Math.random()*3)],
+                    isResource: Math.random() > 0.5 ? '是' : '否',
+                    unitUsage: '1',
+                    isRequired: String(Math.floor(Math.random()*100)+50),
+                    yieldRate: (0.9 + Math.random()*0.09).toFixed(2),
+                    issuedQty: String(Math.floor(Math.random()*5000)),
+                    unIssuedQty: String(Math.floor(Math.random()*3000)),
+                    availableQty: String(available),
+                    onHandQty: String(Math.floor(Math.random()*2000)),
+                    issueWarehouse: ['WH-A','WH-B','WH-C'][Math.floor(Math.random()*3)],
+                    configInventoryQty: String(Math.floor(Math.random()*3000)),
+                    woShortageQty: String(shortage),
+                    availableStockShortageQty: String(available - Math.floor(Math.random()*500)),
+                    theoreticalAvailableStock: String(Math.max(0, available - Math.floor(Math.random()*300))),
+                    theoreticalAvailableStockInclPoWo: String(available + Math.floor(Math.random()*1000)),
+                    committedKitQty: String(Math.floor(Math.random()*2000)),
+                    issuedKitQty: String(Math.floor(Math.random()*1500)),
+                    committedSumQty: String(Math.floor(Math.random()*3000)),
+                    unKitQty: String(Math.floor(Math.random()*1000)),
+                    estimatedMaterialReadyDate: kitStatus ? '' : new Date(2025, Math.floor(Math.random()*6)+8, Math.floor(Math.random()*28)+1).toISOString().split('T')[0],
+                    actualMaterialReadyDate: kitStatus ? rt.toISOString().split('T')[0] : '',
+                    hasAlternativeMaterial: Math.random() > 0.7 ? '是' : '否',
+                    alternativeMaterialStock: Math.random() > 0.7 ? '有' : '',
+                    isKitComplete: kitStatus,
+                    supplyDetails: {
+                        pr: Math.floor(Math.random()*5),
+                        po: Math.floor(Math.random()*8),
+                        wo: Math.floor(Math.random()*3)
+                    }
+                });
+            }
+        }
+
+        function buildHeaderHtml() {
+            var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
+            currentColumnConfig.forEach(function(c) {
+                if (c.field === 'operations') return;
+                var cls = '';
+                if (c.leftSticky) cls = 'col-left-sticky';
+                else if (c.supplySticky) cls = 'col-supply-sticky';
+                else if (c.actionSticky) cls = 'col-action-sticky';
+                if (c.visible) {
+                    var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
+                    var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
+                    h += '<th class="'+cls+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
+                }
+            });
+            return h + '<th class="col-action-sticky">操作</th></tr>';
+        }
+
+        function sortBy(field) {
+            if (sortField === field) {
+                if (sortDir === 'asc') sortDir = 'desc';
+                else if (sortDir === 'desc') { sortDir = ''; sortField = ''; }
+            } else { sortField = field; sortDir = 'asc'; }
+            if (sortField) {
+                filteredData.sort(function(a, b) {
+                    var va = a[sortField], vb = b[sortField];
+                    if (va == null) va = ''; if (vb == null) vb = '';
+                    var na = parseFloat(va), nb = parseFloat(vb);
+                    if (!isNaN(na) && !isNaN(nb)) return sortDir === 'asc' ? na - nb : nb - na;
+                    va = String(va); vb = String(vb);
+                    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+                    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+            currentPage = 1; renderTable();
+        }
+
+        function buildBodyHtml() {
+            var s = (currentPage-1)*pageSize, e = Math.min(s+pageSize, filteredData.length);
+            var h = '';
+            for (var i = s; i < e; i++) {
+                var d = filteredData[i];
+                h += '<tr data-idx="'+i+'"><td class="col-check"><input type="checkbox"></td>';
+                currentColumnConfig.forEach(function(c) {
+                    if (c.field==='operations'||!c.visible) return;
+                    var tc = '';
+                    if (c.leftSticky) tc = 'col-left-sticky';
+                    else if (c.supplySticky) tc = 'col-supply-sticky';
+                    else if (c.actionSticky) tc = 'col-action-sticky';
+                    var v = d[c.field];
+                    if (c.field==='workOrderNo') {
+                        h += '<td class="'+tc+'"><a class="link" onclick="jumpToM2('+i+')">'+(v||'')+'</a></td>';
+                    } else if (c.field==='componentMaterialCode') {
+                        h += '<td class="'+tc+'"><a class="link" onclick="jumpToM3('+i+')">'+(v||'')+'</a></td>';
+                    } else if (c.field==='isKitComplete') {
+                        h += '<td class="'+tc+'"><span class="badge '+(v?'badge-success':'badge-danger')+'">'+(v?'齐套':'不齐套')+'</span></td>';
+                    } else if (c.field==='supplyDetails') {
+                        var pd = v;
+                        h += '<td class="'+tc+'">';
+                        h += '<span class="supply-link" onclick="window.location.href=\'../supply/T2-pr-info.html?materialCode='+d.materialCode+'\'">PR:'+pd.pr+'</span> ';
+                        h += '<span class="supply-link" onclick="window.location.href=\'../supply/T1-po-report.html?materialCode='+d.materialCode+'\'">PO:'+pd.po+'</span> ';
+                        h += '<span class="supply-link" onclick="openWODrawer(\''+d.workOrderNo+'\',\''+d.materialCode+'\')">WO:'+pd.wo+'</span>';
+                        h += '</td>';
+                    } else if (c.field==='woShortageQty') {
+                        var nv = parseInt(v||0);
+                        h += '<td class="'+tc+'"><span class="'+(nv<0?'text-danger':'')+'">'+(v||'0')+'</span></td>';
+                    } else if (c.field==='alternativeMaterialStock') {
+                        h += '<td class="'+tc+'">'+(v?'<a class="link" onclick="openAltMaterialDrawer(\''+d.componentMaterialCode+'\')">替代料</a>':'-')+'</td>';
+                    } else if (c.field==='workOrderStatus') {
+                        var stc = v==='完工'?'badge-success':(v==='进行中'?'badge-warning':'badge-danger');
+                        h += '<td class="'+tc+'"><span class="badge '+stc+'">'+(v||'')+'</span></td>';
+                    } else {
+                        h += '<td class="'+tc+'">'+(v!==undefined?v:'')+'</td>';
+                    }
+                });
+                h += '<td class="col-action-sticky"><a class="link" onclick="jumpToM2('+i+')">工单详情</a> | <a class="link" onclick="jumpToM3('+i+')">物料详情</a></td></tr>';
+            }
+            return h;
+        }
+
+        function renderTable() {
+            document.getElementById('tableHead').innerHTML = buildHeaderHtml();
+            document.getElementById('tableBody').innerHTML = buildBodyHtml();
+            document.getElementById('totalCount').textContent = filteredData.length;
+            document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/pageSize)||1;
+            document.getElementById('currentPage').textContent = currentPage;
+        }
+
+        function updateStats() {
+            var full = 0, empty = 0;
+            filteredData.forEach(function(d){ if(d.isKitComplete) full++; else empty++; });
+            document.getElementById('statFullVal').textContent = full;
+            document.getElementById('statEmptyVal').textContent = empty;
+        }
+
+        function filterByKit(tp) {
+            if (tp === 'full') filteredData = filteredData.filter(function(d){return d.isKitComplete;});
+            else filteredData = filteredData.filter(function(d){return !d.isKitComplete;});
+            currentPage = 1; renderTable();
+            showToast('已筛选 ' + filteredData.length + ' 条', 'success');
+        }
+
+        function showToast(m, tp) {
+            var t = document.getElementById('toast');
+            t.querySelector('.toast-message').textContent = m;
+            t.querySelector('.toast-icon').textContent = '✓';
+            t.className = 'toast success show';
+            setTimeout(function(){ t.classList.remove('show'); }, 2500);
+        }
+
+        function doSearch() {
+            var cc = document.getElementById('q_configCode').value;
+            var org = document.getElementById('q_orgName').value;
+            var on = document.getElementById('q_orderNo').value.trim();
+            var ot = document.getElementById('q_orderType').value;
+            var mc = document.getElementById('q_materialCode').value.trim();
+            var wo = document.getElementById('q_workOrderNo').value.trim();
+            var cm = document.getElementById('q_componentMaterialCode').value.trim();
+            var cr = document.getElementById('q_componentResponsibleParty').value.trim();
+            var kit = document.getElementById('q_isKitComplete').value;
+            filteredData = allData.filter(function(d) {
+                if (cc && d.configCode !== cc) return false;
+                if (org && d.orgName !== org) return false;
+                if (on && d.orderNo.indexOf(on) === -1) return false;
+                if (ot && d.orderType !== ot) return false;
+                if (mc && d.materialCode.indexOf(mc) === -1) return false;
+                if (wo && d.workOrderNo.indexOf(wo) === -1) return false;
+                if (cm && d.componentMaterialCode.indexOf(cm) === -1) return false;
+                if (cr && d.componentResponsibleParty.indexOf(cr) === -1) return false;
+                if (kit === '是' && !d.isKitComplete) return false;
+                if (kit === '否' && d.isKitComplete) return false;
+                return true;
+            });
+            currentPage = 1; renderTable(); updateStats();
+            showToast('查询完成，共 ' + filteredData.length + ' 条记录', 'success');
+        }
+
+        function resetQuery() {
+            ['q_configCode','q_orgName','q_orderNo','q_orderType','q_materialCode','q_requiredCompletionDate','q_workOrderNo','q_componentMaterialCode','q_componentResponsibleParty','q_actualMaterialReadyDate','q_isKitComplete'].forEach(function(id){
+                document.getElementById(id).value = '';
+            });
+            filteredData = allData.slice(); currentPage = 1; renderTable(); updateStats();
+            showToast('查询条件已重置', 'success');
+        }
+
+        function runKit() { showToast('齐套计算已启动...', 'success'); }
+        function saveData() { showToast('数据已保存', 'success'); }
+        function exportData() {
+            var vf = currentColumnConfig.filter(function(c){ return c.visible && c.field !== 'operations'; });
+            var h = vf.map(function(c){ return c.name; }).join('\t') + '';
+            var csv = '\ufeff' + h;
+            filteredData.forEach(function(d) {
+                csv += vf.map(function(c) {
+                    var v = d[c.field];
+                    return typeof v === 'object' ? JSON.stringify(v) : (v !== undefined && v !== null ? v : '');
+                }).join('\t') + '';
+            });
+            var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+            a.download = '工单齐套明细_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
+            showToast('导出成功', 'success');
+        }
+        function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
+        function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
+
+        function openColumnConfig() { renderColumnList(); document.getElementById('columnModal').classList.add('show'); document.getElementById('colOverlay').classList.add('show'); }
+        function closeColumnConfig() { document.getElementById('columnModal').classList.remove('show'); document.getElementById('colOverlay').classList.remove('show'); }
+        function renderColumnList() {
+            var h = '';
+            fieldDefs.forEach(function(f, i) {
+                var ck = currentColumnConfig[i] && currentColumnConfig[i].visible ? 'checked' : '';
+                h += '<label class="column-item"><input type="checkbox" '+ck+' onchange="toggleColVis('+i+',this.checked)"><span>'+f.name+'</span></label>';
+            });
+            document.getElementById('columnList').innerHTML = h;
+        }
+        function toggleColVis(i, v) { if (fieldDefs[i].systemFixed) return; if (currentColumnConfig[i]) currentColumnConfig[i].visible = v; renderTable(); }
+        function resetColumnConfig() { currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); }); renderColumnList(); renderTable(); showToast('已恢复默认列配置', 'success'); }
+        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用', 'success'); }
+
+        function openAdvSearch() {
+            if (document.getElementById('advConditionList').children.length === 0) addAdvCondition();
+            document.getElementById('advModal').classList.add('show'); document.getElementById('advOverlay').classList.add('show');
+        }
+        function closeAdvSearch() { document.getElementById('advModal').classList.remove('show'); document.getElementById('advOverlay').classList.remove('show'); }
+        function addAdvCondition() {
+            var fields = fieldDefs.filter(function(f){ return !f.systemFixed && f.field !== 'operations'; });
+            var ops = ['等于','不等于','包含','不包含','大于','小于','大于等于','小于等于'];
+            var fl = fields.map(function(f){ return '<option>'+f.name+'</option>'; }).join('');
+            var ol = ops.map(function(o){ return '<option>'+o+'</option>'; }).join('');
+            var item = document.createElement('div'); item.className = 'condition-item';
+            item.innerHTML = '<select class="field-select"><option>请选择字段</option>'+fl+'</select><select class="op-select">'+ol+'</select><input type="text" placeholder="输入值"><button class="condition-delete" onclick="this.parentElement.remove()">×</button>';
+            document.getElementById('advConditionList').appendChild(item);
+        }
+        function applyAdvSearch() { closeAdvSearch(); showToast('高级搜索已应用', 'success'); }
+
+        function jumpToM2(i) {
+            var d = filteredData[i];
+            window.location.href = 'M2-wo-details.html?workOrderNo=' + encodeURIComponent(d.workOrderNo||'') + '&configCode=' + encodeURIComponent(d.configCode||'') + '&orgName=' + encodeURIComponent(d.orgName||'');
+        }
+        function jumpToM3(i) {
+            var d = filteredData[i];
+            window.location.href = 'M3-material-details.html?componentMaterialCode=' + encodeURIComponent(d.componentMaterialCode||'') + '&configCode=' + encodeURIComponent(d.configCode||'') + '&orgName=' + encodeURIComponent(d.orgName||'');
+        }
+
+        function openDrawer(title, content) {
+            document.querySelector('.drawer-title').innerHTML = title;
+            document.getElementById('drawerBody').innerHTML = content;
+            document.getElementById('woDetailDrawer').classList.add('show');
+            document.getElementById('drawerOverlay').classList.add('show');
+        }
+        function closeDrawer() {
+            document.getElementById('woDetailDrawer').classList.remove('show');
+            document.getElementById('drawerOverlay').classList.remove('show');
+        }
+
+        function openWODrawer(woNo, materialCode) {
+            var html = '<div class="detail-section"><div class="detail-section-title">工单基本信息</div><div class="detail-grid">';
+            html += '<div class="detail-item"><div class="detail-label">工单号</div><div class="detail-value">'+woNo+'</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">组织</div><div class="detail-value">深圳工厂</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">工单状态</div><div class="detail-value">进行中</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">优先级</div><div class="detail-value">P1</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">关联料号</div><div class="detail-value">'+materialCode+'</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">订单数量</div><div class="detail-value">1000</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">已完工数量</div><div class="detail-value">600</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">未完成数量</div><div class="detail-value">400</div></div>';
+            html += '</div></div>';
+            html += '<div class="detail-section"><div class="detail-section-title">物料需求</div><div class="detail-grid">';
+            html += '<div class="detail-item"><div class="detail-label">组件物料</div><div class="detail-value">COMP-A001</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">单位用量</div><div class="detail-value">1</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">需求数量</div><div class="detail-value">400</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">已发料量</div><div class="detail-value">200</div></div>';
+            html += '</div></div>';
+            openDrawer('📋 工单详情 - ' + woNo, html);
+        }
+
+        function openPRDrawer(materialCode) {
+            var html = '<div class="detail-section"><div class="detail-section-title">PR信息（料号: '+materialCode+'）</div>';
+            html += '<table class="data-table" style="width:100%;"><thead><tr><th>PR单号</th><th>PR行号</th><th>供应商</th><th>需求数量</th><th>需求日期</th><th>状态</th></tr></thead><tbody>';
+            for (var i = 1; i <= 3; i++) {
+                html += '<tr><td>PR-2025-00'+i+'</td><td>'+i+'</td><td>深圳华天</td><td>500</td><td>2025-07-15</td><td><span class="badge badge-warning">已审批</span></td></tr>';
+            }
+            html += '</tbody></table></div>';
+            openDrawer('📝 PR信息 - ' + materialCode, html);
+        }
+
+        function openPODrawer(materialCode) {
+            var html = '<div class="detail-section"><div class="detail-section-title">PO信息（料号: '+materialCode+'）</div>';
+            html += '<table class="data-table" style="width:100%;"><thead><tr><th>PO号</th><th>PO行号</th><th>供应商</th><th>订单数量</th><th>已收货</th><th>承诺交期</th><th>状态</th></tr></thead><tbody>';
+            for (var i = 1; i <= 4; i++) {
+                html += '<tr><td>PO-2025-00'+i+'</td><td>'+i+'</td><td>上海通富</td><td>800</td><td>400</td><td>2025-07-20</td><td><span class="badge badge-success">已到货</span></td></tr>';
+            }
+            html += '</tbody></table></div>';
+            openDrawer('🛒 PO信息 - ' + materialCode, html);
+        }
+
+        function openAltMaterialDrawer(materialCode) {
+            var html = '<div class="detail-section"><div class="detail-section-title">替代料信息（料号: '+materialCode+'）</div>';
+            html += '<table class="data-table" style="width:100%;"><thead><tr><th>替代料号</th><th>物料描述</th><th>供应商</th><th>库存数量</th><th>单位</th><th>是否可用</th></tr></thead><tbody>';
+            var alts = [{code:'ALT-A001',desc:'替代芯片-1',sup:'南京华天',qty:'2000'},{code:'ALT-A002',desc:'替代芯片-2',sup:'北京中芯',qty:'1500'}];
+            alts.forEach(function(a){
+                html += '<tr><td>'+a.code+'</td><td>'+a.desc+'</td><td>'+a.sup+'</td><td>'+a.qty+'</td><td>PCS</td><td><span class="badge badge-success">可用</span></td></tr>';
+            });
+            html += '</tbody></table></div>';
+            openDrawer('🔄 替代料 - ' + materialCode, html);
+        }
+
+        init();
+    </script>
+</body>
+</html>
