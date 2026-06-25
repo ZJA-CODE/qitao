@@ -31,22 +31,10 @@
         .tab-item.active .tab-close { opacity: 0.8; }
         .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
-        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
-        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
-.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
-        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
-        .toolbar-breadcrumb a:hover { text-decoration: underline; }
-        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
-        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
         .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
         .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
         .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
@@ -54,22 +42,11 @@
         .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
         .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
         .toolbar-query .query-label.required::after { content: " *"; color: var(--danger); }
-        .query-bar { padding: 12px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 16px; align-items: center; flex-shrink: 0; }
-        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-        .query-item input, .query-item select { height: 30px; min-width: 120px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
-        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-        .query-label { color: var(--text-secondary); white-space: nowrap; }
         .stat-bar { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: var(--text-muted); }
         .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
         .btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
-        .btn-add { background: var(--primary); border-color: var(--primary); color: white; }
-        .btn-add:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
-        .btn-delete { background: var(--bg-white); border-color: var(--border); color: var(--text-secondary); }
-        .btn-delete:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
-        .btn-link { background: transparent; border: none; color: var(--primary); padding: 4px 8px; height: auto; }
-        .btn-link:hover { background: var(--primary-bg); }
         .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
         .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
         .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
@@ -96,7 +73,7 @@
         .pagination { display: flex; align-items: center; gap: 8px; }
         .page-info { padding: 0 8px; }
         .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
-        .toast.show { transform: translateX(0); }
+        .toast.show { transform: translate(0); }
         .toast.success { border-left: 3px solid var(--success); }
         .toast.error { border-left: 3px solid var(--danger); }
         .toast-icon { font-size: 16px; }
@@ -112,12 +89,11 @@
         .modal-close:hover { background: var(--border-light); color: var(--text); }
         .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
         .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
-        .footer-actions { display: flex; gap: 8px; }
+        .footer-actions { display: flex; gap: 8px }
         .footer-hint { font-size: 12px; color: var(--text-muted); }
         .sub-table { width: 100%; font-size: 13px; border-collapse: collapse; }
         .sub-table th, .sub-table td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
-        .sub-table thead th { background: var(--table-header); font-weight: 600; position: sticky; top: 0; font-size: 12px; }
-        .sub-table tbody tr:hover td { background: var(--table-hover); }
+        .sub-table thead th { background: var(--table-header); font-weight: 600; position: sticky; top: 0; font-size: 12px; }        .sub-table tbody tr:hover td { background: var(--table-hover); }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -126,18 +102,34 @@
 </head>
 <body>
     <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
-        <header class="app-header">
+    <header class="app-header">
         <div class="app-title">工单齐套管理系统</div>
         <div class="tab-bar"></div>
     </header>
     <div class="page-container">
-        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">C2 优先级维护</span></span>                <div class="toolbar-actions">                    <button class="btn btn-primary btn-sm" onclick="exportData()">导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label" style="color:var(--danger);">组织 *</span><select id="qOrgName"><option value="">请选择</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select>
-            </div>                <div class="query-item"><span class="query-label">工单号</span><input type="text" id="qWorkOrderNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">料号</span><input type="text" id="qMaterialCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">订单编号</span><input type="text" id="qOrderNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">订单类型</span><select id="qOrderType"><option value="">全部</option><option>标准订单</option><option>紧急订单</option><option>预测订单</option><option>补货订单</option></select></div>                <div class="query-item"><span class="query-label">工单优先级</span><input type="number" id="qWorkOrderPriority" placeholder="数值" style="min-width:80px;"></div>                <div class="query-item"><span class="query-label">要求完成日期</span><input type="date" id="qRequiredCompletionDate"></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="stat-bar">
-            <span>提示：工单优先级由人工维护，优先级数值越小优先级越高（1为最高）</span>
-            <div style="display:flex;gap:8px;margin-left:auto;align-items:center;">
-                <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button>
-                <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
+        <div class="unified-toolbar">
+            <div class="toolbar-row">
+                <span class="toolbar-page-title">C2 工单优先级维护</span>
+                <div class="toolbar-actions">
+                    <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button>
+                    <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
+                    <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
+                </div>
             </div>
+            <div class="toolbar-query">
+                <div class="query-item"><span class="query-label" style="color:var(--danger);">组织 *</span><select id="qOrgName"><option value="">请选择</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                <div class="query-item"><span class="query-label">工单号</span><input type="text" id="qWorkOrderNo" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">料号</span><input type="text" id="qMaterialCode" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">订单编号</span><input type="text" id="qOrderNo" placeholder="多条件逗号分隔"></div>
+                <div class="query-item"><span class="query-label">订单类型</span><select id="qOrderType"><option value="">全部</option><option>标准订单</option><option>紧急订单</option><option>预测订单</option><option>补货订单</option></select></div>
+                <div class="query-item"><span class="query-label">工单优先级</span><input type="number" id="qWorkOrderPriority" placeholder="数值" style="min-width:80px;"></div>
+                <div class="query-item"><span class="query-label">要求完成日期</span><input type="date" id="qRequiredCompletionDate"></div>
+                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>
+                <button class="btn btn-sm" onclick="resetQuery()">重置</button>
+            </div>
+        </div>
+        <div class="stat-bar">
+            <span>提示：工单优先级由人工维护，优先级数值越小优先级越高（1为最高）</span>
         </div>
         <div class="table-container">
             <div class="table-wrapper">
@@ -187,7 +179,7 @@
             <div class="footer-actions">
                 <button class="btn btn-sm" onclick="closeAdvSearch()">取消</button>
                 <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">应用</button>
-            </div>
+            </div
         </div>
     </div>
 
@@ -247,8 +239,8 @@
         </div>
     </div>
 
-    <script src="../../src/js/tab-manager.js"></script><script>
-        // C2 工单优先级字段定义
+    <script src="../../js/tab-manager.js"></script>
+    <script>
         var c2FieldDefs = [
             {field:'workOrderNo',name:'工单号',visible:true,systemFixed:true},
             {field:'orgName',name:'组织',visible:true},
@@ -272,7 +264,6 @@
         var selectedFile = null;
         var advConditions = [];
 
-        // 初始化
         function init() {
             pageSize = 50; currentPage = 1;
             generateSampleData();
@@ -281,7 +272,6 @@
             initAdvConditions();
         }
 
-        // 生成示例数据
         function generateSampleData() {
             var orgs = ['深圳工厂','上海工厂','北京工厂','成都工厂'];
             var orderTypes = ['标准订单','紧急订单','预测订单','补货订单'];
@@ -310,11 +300,9 @@
                     updateDate: cd.toISOString().split('T')[0]
                 });
             }
-            // 按优先级排序
             allData.sort(function(a,b){ return a.workOrderPriority - b.workOrderPriority; });
         }
 
-        // 排序功能
         function sortBy(field) {
             if (sortField === field) {
                 if (sortDir === 'asc') sortDir = 'desc';
@@ -335,7 +323,6 @@
             currentPage = 1; renderTable();
         }
 
-        // 构建表头
         function buildHeaderHtml() {
             var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
             currentColumnConfig.forEach(function(c) {
@@ -349,7 +336,6 @@
             return h + '<th class="col-right-sticky">操作</th></tr>';
         }
 
-        // 构建表体
         function buildBodyHtml() {
             var s = (currentPage-1)*pageSize, e = Math.min(s+pageSize, filteredData.length);
             var h = '';
@@ -371,7 +357,6 @@
             return h;
         }
 
-        // 渲染表格
         function renderTable() {
             document.getElementById('tableHead').innerHTML = buildHeaderHtml();
             document.getElementById('tableBody').innerHTML = buildBodyHtml();
@@ -380,7 +365,6 @@
             document.getElementById('currentPage').textContent = currentPage;
         }
 
-        // 数据操作
         function updateField(i,f,v) { 
             if(filteredData[i]) filteredData[i][f]=v; 
             if(allData[i]) allData[i][f]=v; 
@@ -396,15 +380,11 @@
 
         function saveAllData() {
             var now = new Date().toISOString().split('T')[0];
-            allData.forEach(function(d){
-                d.updatedBy = '当前用户';
-                d.updateDate = now;
-            });
+            allData.forEach(function(d){ d.updatedBy = '当前用户'; d.updateDate = now; });
             showToast('所有数据已保存，共 '+allData.length+' 条记录','success');
             renderTable();
         }
 
-        // 查询功能
         function doSearch() {
             var org = document.getElementById('qOrgName').value;
             var wo = document.getElementById('qWorkOrderNo').value.trim();
@@ -440,13 +420,11 @@
             showToast('查询条件已重置', 'success');
         }
 
-        // 分页功能
         function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
         function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
         function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
         function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
 
-        // ===== 自定义列功能 =====
         function openColumnConfig() {
             renderColumnList();
             document.getElementById('columnModal').classList.add('show');
@@ -473,7 +451,6 @@
         function resetColumnConfig() { currentColumnConfig = c2FieldDefs.map(function(f){return Object.assign({},f);}); renderColumnList(); }
         function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用','success'); }
 
-        // ===== 高级搜索功能 =====
         function initAdvConditions() {
             advConditions = [
                 {field:'workOrderNo',op:'contains',value:''},
@@ -483,7 +460,7 @@
         function openAdvSearch() {
             renderAdvConditions();
             document.getElementById('advModal').classList.add('show');
-            document.getElementById('advOverlay').classList.add('show');
+ document.getElementById('advOverlay').classList.add('show');
         }
         function closeAdvSearch() {
             document.getElementById('advModal').classList.remove('show');
@@ -499,7 +476,7 @@
                 h += '</select>' +
                      '<select style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" onchange="advConditions['+i+'].op=this.value">' +
                      '<option value="contains" '+(c.op==='contains'?'selected':'')+'>包含</option>' +
-                     '<option value="equals" '+(c.op==='equals'?'selected':'')+'>等于</option>' +
+                      '<option value="equals" '+(c.op==='equals'?'selected':'')+'>等于</option>' +
                      '<option value="gt" '+(c.op==='gt'?'selected':'')+'>大于</option>' +
                      '<option value="lt" '+(c.op==='lt'?'selected':'')+'>小于</option>' +
                      '</select>' +
@@ -513,10 +490,7 @@
             advConditions.push({field:'workOrderNo',op:'contains',value:''});
             renderAdvConditions();
         }
-        function removeAdvCondition(i) {
-            advConditions.splice(i, 1);
-            renderAdvConditions();
-        }
+        function removeAdvCondition(i) { advConditions.splice(i, 1); renderAdvConditions(); }
         function applyAdvSearch() {
             filteredData = allData.filter(function(d) {
                 return advConditions.every(function(c) {
@@ -536,7 +510,6 @@
             showToast('高级搜索完成，共 ' + filteredData.length + ' 条记录', 'success');
         }
 
-        // ===== 导入功能 =====
         function openImportModal() {
             selectedFile = null;
             document.getElementById('importFileInfo').style.display = 'none';
@@ -560,15 +533,11 @@
             document.getElementById('importFileInfo').style.display = 'none';
         }
         function doImport() {
-            if (!selectedFile) {
-                showToast('请先选择文件', 'error');
-                return;
-            }
+            if (!selectedFile) { showToast('请先选择文件', 'error'); return; }
             showToast('导入功能演示：' + selectedFile.name, 'success');
             closeImportModal();
         }
 
-        // ===== 导出功能 =====
         function openExportModal() {
             document.getElementById('exportModal').classList.add('show');
             document.getElementById('exportOverlay').classList.add('show');
@@ -577,26 +546,21 @@
             document.getElementById('exportModal').classList.remove('show');
             document.getElementById('exportOverlay').classList.remove('show');
         }
+        function exportData() { openExportModal(); }
         function doExport() {
             var scope = document.getElementById('exportScope').value;
             var dataToExport = scope === 'filtered' ? filteredData : allData;
-            
             var csv = '\ufeff工单号\t工单优先级';
-            dataToExport.forEach(function(d) {
-                csv += d.workOrderNo + '\t' + d.workOrderPriority + '';
-            });
-            
+            dataToExport.forEach(function(d) { csv += d.workOrderNo + '\t' + d.workOrderPriority + ''; });
             var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
             var a = document.createElement('a');
             a.href = URL.createObjectURL(b);
             a.download = '工单优先级_' + new Date().toISOString().split('T')[0] + '.csv';
             a.click();
-            
             showToast('导出成功，共 ' + dataToExport.length + ' 条记录', 'success');
             closeExportModal();
         }
 
-        // ===== Toast提示 =====
         function showToast(m, tp) {
             var t = document.getElementById('toast');
             t.querySelector('.toast-message').textContent = m;
@@ -606,7 +570,7 @@
         }
 
         init();
-TabManager.init();
+        TabManager.init();
     </script>
 </body>
 </html>

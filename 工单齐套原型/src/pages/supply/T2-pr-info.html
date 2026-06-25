@@ -29,7 +29,9 @@
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
-.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
         .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
@@ -114,11 +116,10 @@
         <div class="tab-bar"></div>
     </header>
     <div class="page-container">
-        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">T2 PR信息表</span></span>                <div class="toolbar-actions">                    <button class="btn btn-sm btn-link" onclick="exportData()">导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select>
+        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-page-title">T2 供给PR信息</span>                <div class="toolbar-actions">                    <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button><button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button><button class="btn btn-sm btn-primary" onclick="exportData()">📤 导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select>
             </div>                <div class="query-item"><span class="query-label">PR单号</span><input type="text" id="q_prNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">料号</span><input type="text" id="q_materialCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">供应商编码</span><input type="text" id="q_supplierCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">需求日期</span><input type="date" id="q_requiredDate"></div>                <div class="query-item"><span class="query-label">PR状态</span><select id="q_prStatus"><option value="">全部</option><option>待审批</option><option>已审批</option><option>已转PO</option><option>已关闭</option></select></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="stat-cards">
             <div class="stat-tools">
-                <button class="stat-tool-btn" onclick="openAdvSearch()" title="高级搜索">🔍</button>
-                <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
+                
             </div>
         </div>
         <div class="table-container">
@@ -144,7 +145,7 @@
         <div class="modal-body"><div class="column-list" id="columnList"></div></div>
         <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
     </div>
-    <script src="../../src/js/tab-manager.js"></script><script>
+    <script src="../../js/tab-manager.js"></script><script>
         // SPEC.md T2 - PR信息表 - 20个字段
         var fieldDefs = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},

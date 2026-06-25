@@ -40,7 +40,9 @@
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
-.unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
         .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
@@ -171,7 +173,7 @@
     <div class="page-container">
         <div class="unified-toolbar">
             <div class="toolbar-row">
-                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">M1 工单齐套明细</span></span>
+                <span class="toolbar-page-title">M1 工单齐套明细</span>
             </div>
             <div class="toolbar-query">
                 <div class="query-item"><span class="query-label required">配置编码</span><select id="q_configCode"><option value="">请选择</option><option>CFG-2025-00001</option><option>CFG-2025-00002</option></select></div>
@@ -242,7 +244,7 @@
         <div class="drawer-footer"><button class="btn btn-sm" onclick="closeDrawer()">关闭</button><button class="btn btn-primary btn-sm" onclick="showToast('已跳转','success')">查看详情</button></div>
     </div>
 
-    <script src="../../src/js/tab-manager.js"></script><script>
+    <script src="../../js/tab-manager.js"></script><script>
         // SPEC.md 屏幕9: M1 工单齐套明细 - 62个字段
         var fieldDefs = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},

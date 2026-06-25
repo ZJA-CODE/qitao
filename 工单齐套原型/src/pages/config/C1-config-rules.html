@@ -40,13 +40,10 @@
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
+        .toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
 .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
-        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
-        .toolbar-breadcrumb a:hover { text-decoration: underline; }
-        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
-        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
         .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
         .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
         .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
@@ -146,8 +143,10 @@
     <div class="page-container">
         <div class="unified-toolbar">
             <div class="toolbar-row">
-                <span class="toolbar-breadcrumb"><a href="../../../index.html">首页</a><span class="sep">/</span><span class="current">C1 齐套规则配置</span></span>
+                <span class="toolbar-page-title">C1 齐套规则配置</span>
                 <div class="toolbar-actions">
+                    <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button>
+                    <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
                     <button class="btn btn-sm btn-primary" onclick="doAdd()">新增</button>
                     <button class="btn btn-sm btn-danger" onclick="doDelete()">删除</button>
                     <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
@@ -363,7 +362,7 @@
         </div>
     </div>
 
-    <script src="../../src/js/tab-manager.js"></script><script>
+    <script src="../../js/tab-manager.js"></script><script>
         // 表格字段定义 - 已移除"是否有效"字段
         var tableFields = [
             {field: 'seqNo', name: '序号', visible: true, width: 60},
@@ -1134,6 +1133,26 @@
                 allData[index][field] = value;
                 showToast('配置描述已更新', 'success');
             }
+        }
+
+        // 高级搜索
+        function openAdvSearch() {
+            showToast('高级搜索功能开发中', 'success');
+        }
+
+        // 自定义列
+        function openColumnConfig() {
+            showToast('自定义列功能开发中', 'success');
+        }
+
+        // 新增（映射到addNewRow）
+        function doAdd() {
+            addNewRow();
+        }
+
+        // 删除（映射到deleteSelectedRows）
+        function doDelete() {
+            deleteSelectedRows();
         }
 
         // Toast提示
