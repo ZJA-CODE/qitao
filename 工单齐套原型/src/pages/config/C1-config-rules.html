@@ -31,11 +31,11 @@
         .tab-item.active .tab-close { opacity: 0.8; }
         .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        
+        
+        
+        
+        
         .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
@@ -56,7 +56,7 @@
         .query-item input, .query-item select { height: 30px; min-width: 120px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
         .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
         .query-label { color: var(--text-secondary); white-space: nowrap; }
-        .stat-bar { padding: 8px 20px; background: var(--warning-bg); border-bottom: 1px solid var(--warning-border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: #ad6800; }
+        .stat-bar { padding: 8px 20px; background: #e8f0fe; border-bottom: 1px solid #c2d4f7; display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: #4285f4; }
         .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
         .btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
@@ -88,8 +88,8 @@
         .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
         .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
         .link:hover { text-decoration: underline; }
-        .config-link { color: var(--warning); cursor: pointer; font-weight: 600; background: var(--warning-bg); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--warning-border); }
-        .config-link:hover { background: var(--warning-border); text-decoration: none; }
+        .config-link { color: #4285f4; cursor: pointer; font-weight: 600; background: #e8f0fe; padding: 4px 12px; border-radius: 20px; border: 1px solid #c2d4f7; display: inline-block; }
+        .config-link:hover { background: #d2e3fc; text-decoration: none; }
         .editable-input { height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; width: 100%; min-width: 120px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
         .editable-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
         .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
@@ -105,6 +105,7 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
         .modal-overlay.show { display: block; }
         .drawer { display: none; position: fixed; top: 0; right: 0; bottom: 0; width: 650px; max-width: 90vw; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.12); z-index: 1001; flex-direction: column; overflow: hidden; transform: translateX(100%); transition: transform 0.3s; }
+        .drawer[style*="width"] { width: 650px !important; }
         .drawer.show { display: flex; transform: translateX(0); }
         .drawer-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
         .drawer-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
@@ -145,10 +146,8 @@
             <div class="toolbar-row">
                 <span class="toolbar-page-title">C1 齐套规则配置</span>
                 <div class="toolbar-actions">
-                    <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button>
-                    <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
-                    <button class="btn btn-sm btn-primary" onclick="doAdd()">新增</button>
-                    <button class="btn btn-sm btn-danger" onclick="doDelete()">删除</button>
+                    <button class="btn btn-sm btn-primary" onclick="addNewRow()">新增</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSelectedRows()">删除</button>
                     <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
                 </div>
             </div>
@@ -184,7 +183,7 @@
     </div>
 
     <!-- C1_1 组织配置抽屉 -->
-    <div class="modal" id="c1_1Overlay" onclick="closeDrawer('c1_1')"></div>
+    <div class="modal-overlay" id="c1_1Overlay" onclick="closeDrawer('c1_1')"></div>
     <div class="drawer" id="c1_1Drawer">
         <div class="drawer-header"><h3>📋 C1_1 组织配置</h3><button class="modal-close" onclick="closeDrawer('c1_1')">×</button></div>
         <div class="drawer-body">
@@ -244,7 +243,7 @@
 
     <!-- C1_3 供给仓位配置抽屉 -->
     <div class="modal-overlay" id="c1_3Overlay" onclick="closeDrawer('c1_3')"></div>
-    <div class="drawer" id="c1_3Drawer" style="width:720px;">
+    <div class="drawer" id="c1_3Drawer">
         <div class="drawer-header"><h3>📋 C1_3 EBS供给仓位配置</h3><button class="modal-close" onclick="closeDrawer('c1_3')">×</button></div>
         <div class="drawer-body">
             <div class="sub-query">
@@ -302,7 +301,7 @@
 
     <!-- C1_5 工单状态配置抽屉 -->
     <div class="modal-overlay" id="c1_5Overlay" onclick="closeDrawer('c1_5')"></div>
-    <div class="drawer" id="c1_5Drawer" style="width:500px;">
+    <div class="drawer" id="c1_5Drawer">
         <div class="drawer-header"><h3>📋 C1_5 工单状态配置</h3><button class="modal-close" onclick="closeDrawer('c1_5')">×</button></div>
         <div class="drawer-body">
             <div class="sub-query">
@@ -325,7 +324,8 @@
                 <button class="btn btn-sm" onclick="closeDrawer('c1_5')">取消</button>
                 <button class="btn btn-primary btn-sm" onclick="applyC1_5Config()">确认</button>
             </div>
- </div>    </div
+        </div>
+    </div>
 
     <!-- C1_3_1 仓位选择弹窗（可拖动） -->
     <div class="modal-overlay" id="c1_3_1Overlay" onclick="closeC1_3_1Modal()"></div>
@@ -1141,9 +1141,25 @@
         }
 
         // 自定义列
-        function openColumnConfig() {
-            showToast('自定义列功能开发中', 'success');
-        }
+        function openColumnConfig() { ColumnConfigTransfer.open(); }
+
+        // 初始化穿梭框组件（C1使用tableFields而非fieldDefs）
+        ColumnConfigTransfer.init(
+            tableFields,
+            function(newDefs) {
+                tableFields = newDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function() {
+                // Reset - reload page to get defaults
+                location.reload();
+            },
+            function(savedDefs) {
+                tableFields = savedDefs.map(function(f){ return Object.assign({},f); });
+                try { localStorage.setItem('C1_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
+                renderTable();
+            }
+        );
 
         // 新增（映射到addNewRow）
         function doAdd() {
@@ -1215,7 +1231,21 @@
         generateMockData();
         renderTable();
         initDraggableModal('c1_3_1Modal', 'c1_3_1Header');
-TabManager.init();
+// 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套规则配置': { url: 'C1-config-rules.html' },
+            '工单优先级维护': { url: 'C2-priority.html' },
+            '组件责任方配置': { url: 'C3-responsible-party.html' },
+            '供给PO信息': { url: 'T1-po-report.html' },
+            '供给PR信息': { url: 'T2-pr-info.html' },
+            '供给WO信息': { url: 'wo-supply.html' },
+            '齐套计算': { url: '../index.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
 </body>
 </html>

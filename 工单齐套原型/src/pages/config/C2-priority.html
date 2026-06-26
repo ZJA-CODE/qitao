@@ -81,7 +81,7 @@
         .toast.error .toast-icon { color: var(--danger); }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
         .modal-overlay.show { display: block; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; width: 850px; }
         .modal.show { display: flex; }
         .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
         .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
@@ -89,19 +89,14 @@
         .modal-close:hover { background: var(--border-light); color: var(--text); }
         .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
         .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
-        .footer-actions { display: flex; gap: 8px }
-        .footer-hint { font-size: 12px; color: var(--text-muted); }
-        .sub-table { width: 100%; font-size: 13px; border-collapse: collapse; }
-        .sub-table th, .sub-table td { padding: 8px 10px; border: 1px solid var(--border); text-align: left; }
-        .sub-table thead th { background: var(--table-header); font-weight: 600; position: sticky; top: 0; font-size: 12px; }        .sub-table tbody tr:hover td { background: var(--table-hover); }
+        .footer-actions { display: flex; gap: 8px; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     </style>
 </head>
 <body>
-    <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
+    <div class="toast" id="toast"><span class="toast-icon">✓</span><span class="toast-message"></span></div>
     <header class="app-header">
         <div class="app-title">工单齐套管理系统</div>
         <div class="tab-bar"></div>
@@ -111,8 +106,6 @@
             <div class="toolbar-row">
                 <span class="toolbar-page-title">C2 工单优先级维护</span>
                 <div class="toolbar-actions">
-                    <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button>
-                    <button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button>
                     <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
                 </div>
             </div>
@@ -149,127 +142,59 @@
         </div>
     </div>
 
-    <!-- 自定义列弹窗 -->
-    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
-    <div class="modal" id="columnModal" style="width:480px;">
-        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
+    <!-- 自定义列 -->
+    <div class="modal-overlay" id="colOverlay"></div>
+    <div class="modal" id="columnModal"></div>
+
+    <!-- 高级搜索 -->
+    <div class="modal-overlay" id="advSearchOverlay" onclick="closeAdvSearch()"></div>
+    <div class="modal" id="advSearchModal" style="width:600px;">
+        <div class="modal-header"><h3>高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
         <div class="modal-body">
-            <div style="margin-bottom:8px;font-size:12px;color:var(--text-muted);">☑ 勾选显示的列</div>
-            <div style="display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto;" id="columnList"></div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button>
-            <div class="footer-actions">
-                <button class="btn btn-sm" onclick="closeColumnConfig()">取消</button>
-                <button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期起</span><input type="date" id="adv_createDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期止</span><input type="date" id="adv_createDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">更新日期起</span><input type="date" id="adv_updateDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">更新日期止</span><input type="date" id="adv_updateDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">优先级范围</span><input type="number" id="adv_priorityMin" style="width:80px;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="最小"><span style="padding:0 8px;">-</span><input type="number" id="adv_priorityMax" style="width:80px;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="最大"></div>
             </div>
         </div>
-    </div>
-
-    <!-- 高级搜索弹窗 -->
-    <div class="modal-overlay" id="advOverlay" onclick="closeAdvSearch()"></div>
-    <div class="modal" id="advModal" style="width:720px;">
-        <div class="modal-header"><h3>🔍 高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
-        <div class="modal-body">
-            <div style="display:flex;flex-direction:column;gap:8px;" id="advConditionList"></div>
-            <button class="btn btn-sm" style="margin-top:12px;" onclick="addAdvCondition()">+ 添加条件</button>
-        </div>
         <div class="modal-footer">
-            <div class="footer-hint">多个条件之间为 AND 关系</div>
+            <button class="btn btn-sm" onclick="resetAdvSearch()">重置</button>
             <div class="footer-actions">
                 <button class="btn btn-sm" onclick="closeAdvSearch()">取消</button>
-                <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">应用</button>
-            </div
-        </div>
-    </div>
-
-    <!-- 导出弹窗 -->
-    <div class="modal-overlay" id="exportOverlay" onclick="closeExportModal()"></div>
-    <div class="modal" id="exportModal" style="width:480px;">
-        <div class="modal-header"><h3>📥 导出工单优先级</h3><button class="modal-close" onclick="closeExportModal()">×</button></div>
-        <div class="modal-body">
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">导出模板包含以下字段：</div>
-            <table class="sub-table" style="margin-bottom:12px;">
-                <thead><tr><th>字段名称</th><th>是否必填</th><th>说明</th></tr></thead>
-                <tbody>
-                    <tr><td>工单号</td><td><span class="badge badge-danger">必填</span></td><td>用于唯一标识工单</td></tr>
-                    <tr><td>工单优先级</td><td><span class="badge badge-success">选填</span></td><td>数值越小优先级越高</td></tr>
-                </tbody>
-            </table>
-            <div style="margin-bottom:8px;">
-                <label style="font-size:12px;color:var(--text-secondary);">导出范围：</label>
-                <select id="exportScope" style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;margin-left:8px;">
-                    <option value="filtered">当前查询结果</option>
-                    <option value="all">全部</option>
-                </select>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <span class="footer-hint">导出文件格式为 CSV</span>
-            <div class="footer-actions">
-                <button class="btn btn-sm" onclick="closeExportModal()">取消</button>
-                <button class="btn btn-primary btn-sm" onclick="doExport()">确认导出</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 导入弹窗 -->
-    <div class="modal-overlay" id="importOverlay" onclick="closeImportModal()"></div>
-    <div class="modal" id="importModal" style="width:520px;">
-        <div class="modal-header"><h3>📤 导入工单优先级</h3><button class="modal-close" onclick="closeImportModal()">×</button></div>
-        <div class="modal-body">
-            <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;margin-bottom:12px;" onclick="document.getElementById('importFileInput').click()">
-                <div style="font-size:32px;margin-bottom:8px;">📁</div>
-                <div style="font-size:13px;color:var(--text-secondary);">点击或拖拽文件到此处上传</div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">支持 .csv / .xls / .xlsx 格式</div>
-            </div>
-            <input type="file" id="importFileInput" accept=".csv,.xls,.xlsx" style="display:none;" onchange="handleFileSelect(this)">
-            <div id="importFileInfo" style="display:none;align-items:center;gap:8px;padding:10px;background:var(--success-bg);border-radius:var(--radius-sm);margin-top:8px;">
-                <span>📄</span>
-                <span id="selectedFileName" style="font-size:13px;color:var(--success);font-weight:500;"></span>
-                <span style="margin-left:auto;cursor:pointer;color:var(--danger);" onclick="clearSelectedFile()">✕</span>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <span class="footer-hint">导入后将覆盖原有优先级数据</span>
-            <div class="footer-actions">
-                <button class="btn btn-sm" onclick="closeImportModal()">取消</button>
-                <button class="btn btn-primary btn-sm" onclick="doImport()">确认导入</button>
+                <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">搜索</button>
             </div>
         </div>
     </div>
 
     <script src="../../js/tab-manager.js"></script>
+    <script src="../../js/column-config-transfer.js"></script>
     <script>
-        var c2FieldDefs = [
-            {field:'workOrderNo',name:'工单号',visible:true,systemFixed:true},
+        var tableFields = [
+            {field:'seqNo',name:'序号',visible:true,systemFixed:true},
             {field:'orgName',name:'组织',visible:true},
+            {field:'workOrderNo',name:'工单号',visible:true,leftSticky:true},
+            {field:'materialCode',name:'料号',visible:true},
+            {field:'materialDesc',name:'物料描述',visible:true},
             {field:'orderNo',name:'订单编号',visible:true},
             {field:'orderType',name:'订单类型',visible:true},
-            {field:'materialCode',name:'料号',visible:true},
-            {field:'orderQty',name:'下单数量',visible:true},
             {field:'requiredCompletionDate',name:'要求完成日期',visible:true},
-            {field:'workOrderStatus',name:'工单状态',visible:true},
-            {field:'workOrderPriority',name:'工单优先级',visible:true,editable:true,fixedRight:true},
+            {field:'workOrderPriority',name:'工单优先级',visible:true,editable:true},
             {field:'createdBy',name:'创建人',visible:false},
             {field:'createDate',name:'创建日期',visible:false},
-            {field:'updatedBy',name:'编辑人',visible:true},
-            {field:'updateDate',name:'编辑日期',visible:true},
-            {field:'operations',name:'操作',visible:true,isAction:true,fixedRight:true,systemFixed:true}
+            {field:'updatedBy',name:'更新人',visible:false},
+            {field:'updateDate',name:'更新日期',visible:false}
         ];
-        
-        var currentColumnConfig = c2FieldDefs.map(function(f){return Object.assign({},f);});
+        var currentColumnConfig = tableFields.map(function(f){return Object.assign({},f);});
         var allData, filteredData, currentPage, pageSize;
         var sortField = '', sortDir = '';
-        var selectedFile = null;
-        var advConditions = [];
 
         function init() {
             pageSize = 50; currentPage = 1;
             generateSampleData();
             filteredData = allData.slice();
             renderTable();
-            initAdvConditions();
         }
 
         function generateSampleData() {
@@ -277,19 +202,29 @@
             var orderTypes = ['标准订单','紧急订单','预测订单','补货订单'];
             var statuses = ['已发料','未发料','进行中','已完工'];
             var users = ['张三','李四','王五','赵六'];
-            
+            var materials = [
+                {code:'MAT-1001',desc:'芯片封装-QFP128'},
+                {code:'MAT-1002',desc:'芯片封装-BGA256'},
+                {code:'MAT-2001',desc:'PCB主板-8层'},
+                {code:'MAT-2003',desc:'电源模块-DCDC'},
+                {code:'MAT-3001',desc:'连接器-HDMI'}
+            ];
+
             allData = [];
             for (var i = 1; i <= 25; i++) {
                 var now = new Date();
                 var reqDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + Math.floor(Math.random()*30)+1);
                 var cd = new Date(now.getFullYear(), now.getMonth()-Math.floor(Math.random()*2), Math.floor(Math.random()*28)+1);
-                
+                var mat = materials[Math.floor(Math.random()*materials.length)];
+
                 allData.push({
+                    seqNo: i,
                     workOrderNo: 'WO' + String(20260000 + i).padStart(8,'0'),
                     orgName: orgs[Math.floor(Math.random()*orgs.length)],
                     orderNo: 'ORD' + String(Math.floor(Math.random()*900000)+100000),
                     orderType: orderTypes[Math.floor(Math.random()*orderTypes.length)],
-                    materialCode: 'MAT-' + String(Math.floor(Math.random()*9000)+1000),
+                    materialCode: mat.code,
+                    materialDesc: mat.desc,
                     orderQty: Math.floor(Math.random()*500) + 50,
                     requiredCompletionDate: reqDate.toISOString().split('T')[0],
                     workOrderStatus: statuses[Math.floor(Math.random()*statuses.length)],
@@ -326,14 +261,13 @@
         function buildHeaderHtml() {
             var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
             currentColumnConfig.forEach(function(c) {
-                if (c.field === 'operations') return;
                 if (!c.visible) return;
-                var cls = c.fixedRight ? 'col-right-sticky' : '';
+                var cls = c.leftSticky ? 'col-left-sticky' : (c.rightSticky ? 'col-right-sticky' : '');
                 var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
                 var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
                 h += '<th class="'+cls+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
             });
-            return h + '<th class="col-right-sticky">操作</th></tr>';
+            return h + '</tr>';
         }
 
         function buildBodyHtml() {
@@ -343,16 +277,16 @@
                 var d = filteredData[i];
                 h += '<tr data-idx="'+i+'"><td class="col-check"><input type="checkbox"></td>';
                 currentColumnConfig.forEach(function(c) {
-                    if (c.field==='operations'||!c.visible) return;
-                    var tc = c.fixedRight ? 'col-right-sticky' : '';
+                    if (!c.visible) return;
+                    var tc = c.leftSticky ? 'col-left-sticky' : (c.rightSticky ? 'col-right-sticky' : '');
                     var v = d[c.field];
-                    if (c.editable && c.field==='workOrderPriority') {
-                        h += '<td class="'+tc+'"><input class="inline-input" type="number" value="'+(v||'')+'" onchange="updateField('+i+',\'workOrderPriority\',this.value)" style="width:60px;"></td>';
+                    if (c.editable && c.field === 'workOrderPriority') {
+                        h += '<td class="'+tc+'"><input class="inline-input" type="number" value="'+(v||'')+'" onchange="updateField('+i+',\'workOrderPriority\',this.value)" style="width:60px;height:26px;border:1px solid var(--border);border-radius:4px;padding:0 6px;"></td>';
                     } else {
-                        h += '<td class="'+tc+'">'+(v!==undefined?v:'')+'</td>';
+                        h += '<td class="'+tc+'">'+(v!==undefined && v!==null && v!==''?v:'-')+'</td>';
                     }
                 });
-                h += '<td class="col-right-sticky"><a class="link" onclick="saveRow('+i+')">💾 保存</a></td></tr>';
+                h += '</tr>';
             }
             return h;
         }
@@ -365,24 +299,9 @@
             document.getElementById('currentPage').textContent = currentPage;
         }
 
-        function updateField(i,f,v) { 
-            if(filteredData[i]) filteredData[i][f]=v; 
-            if(allData[i]) allData[i][f]=v; 
-        }
-        
-        function saveRow(i) {
-            var now = new Date().toISOString().split('T')[0];
-            if(filteredData[i]) { filteredData[i].updatedBy = '当前用户'; filteredData[i].updateDate = now; }
-            if(allData[i]) { allData[i].updatedBy = '当前用户'; allData[i].updateDate = now; }
-            showToast('工单 '+filteredData[i].workOrderNo+' 优先级已保存','success');
-            renderTable();
-        }
-
-        function saveAllData() {
-            var now = new Date().toISOString().split('T')[0];
-            allData.forEach(function(d){ d.updatedBy = '当前用户'; d.updateDate = now; });
-            showToast('所有数据已保存，共 '+allData.length+' 条记录','success');
-            renderTable();
+        function updateField(i,f,v) {
+            if(filteredData[i]) filteredData[i][f]=v;
+            if(allData[i]) allData[i][f]=v;
         }
 
         function doSearch() {
@@ -393,7 +312,7 @@
             var ot = document.getElementById('qOrderType').value;
             var pr = document.getElementById('qWorkOrderPriority').value;
             var rcd = document.getElementById('qRequiredCompletionDate').value;
-            
+
             filteredData = allData.filter(function(d) {
                 if (org && d.orgName !== org) return false;
                 if (wo && d.workOrderNo.indexOf(wo) === -1) return false;
@@ -425,152 +344,94 @@
         function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
         function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
 
-        function openColumnConfig() {
-            renderColumnList();
-            document.getElementById('columnModal').classList.add('show');
-            document.getElementById('colOverlay').classList.add('show');
-        }
-        function closeColumnConfig() {
-            document.getElementById('columnModal').classList.remove('show');
-            document.getElementById('colOverlay').classList.remove('show');
-        }
-        function renderColumnList() {
-            var h = '';
-            currentColumnConfig.forEach(function(c, i) {
-                var disabled = c.systemFixed ? 'disabled' : '';
-                var checked = c.visible ? 'checked' : '';
-                var style = c.systemFixed ? 'color:var(--text-muted);' : '';
-                h += '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-radius:var(--radius-sm);'+style+'" onclick="return false;">' +
-                     '<input type="checkbox" '+checked+' '+disabled+' onchange="toggleColumn('+i+',this.checked)"> ' +
-                     (c.systemFixed ? '<span style="color:var(--danger);font-size:11px;">*</span>' : '') +
-                     c.name + '</label>';
-            });
-            document.getElementById('columnList').innerHTML = h;
-        }
-        function toggleColumn(idx, val) { currentColumnConfig[idx].visible = val; }
-        function resetColumnConfig() { currentColumnConfig = c2FieldDefs.map(function(f){return Object.assign({},f);}); renderColumnList(); }
-        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用','success'); }
-
-        function initAdvConditions() {
-            advConditions = [
-                {field:'workOrderNo',op:'contains',value:''},
-                {field:'materialCode',op:'contains',value:''}
-            ];
-        }
-        function openAdvSearch() {
-            renderAdvConditions();
-            document.getElementById('advModal').classList.add('show');
- document.getElementById('advOverlay').classList.add('show');
-        }
-        function closeAdvSearch() {
-            document.getElementById('advModal').classList.remove('show');
-            document.getElementById('advOverlay').classList.remove('show');
-        }
-        function renderAdvConditions() {
-            var fields = c2FieldDefs.filter(function(f){return !f.isAction && f.field!=='operations';});
-            var h = '';
-            advConditions.forEach(function(c, i) {
-                h += '<div style="display:flex;gap:8px;align-items:center;">' +
-                     '<select style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" onchange="advConditions['+i+'].field=this.value">';
-                fields.forEach(function(f){ h += '<option value="'+f.field+'" '+(c.field===f.field?'selected':'')+'>'+f.name+'</option>'; });
-                h += '</select>' +
-                     '<select style="height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" onchange="advConditions['+i+'].op=this.value">' +
-                     '<option value="contains" '+(c.op==='contains'?'selected':'')+'>包含</option>' +
-                      '<option value="equals" '+(c.op==='equals'?'selected':'')+'>等于</option>' +
-                     '<option value="gt" '+(c.op==='gt'?'selected':'')+'>大于</option>' +
-                     '<option value="lt" '+(c.op==='lt'?'selected':'')+'>小于</option>' +
-                     '</select>' +
-                     '<input type="text" style="flex:1;height:28px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;" value="'+c.value+'" placeholder="输入值" onchange="advConditions['+i+'].value=this.value">' +
-                     (i > 0 ? '<button class="btn btn-sm" style="height:26px;padding:0 8px;color:var(--danger);" onclick="removeAdvCondition('+i+')">×</button>' : '') +
-                     '</div>';
-            });
-            document.getElementById('advConditionList').innerHTML = h;
-        }
-        function addAdvCondition() {
-            advConditions.push({field:'workOrderNo',op:'contains',value:''});
-            renderAdvConditions();
-        }
-        function removeAdvCondition(i) { advConditions.splice(i, 1); renderAdvConditions(); }
-        function applyAdvSearch() {
-            filteredData = allData.filter(function(d) {
-                return advConditions.every(function(c) {
-                    if (!c.value) return true;
-                    var v = String(d[c.field]||'');
-                    var val = c.value;
-                    switch(c.op) {
-                        case 'contains': return v.indexOf(val) !== -1;
-                        case 'equals': return v === val;
-                        case 'gt': return parseFloat(d[c.field]) > parseFloat(val);
-                        case 'lt': return parseFloat(d[c.field]) < parseFloat(val);
-                        default: return true;
-                    }
-                });
-            });
-            currentPage = 1; renderTable(); closeAdvSearch();
-            showToast('高级搜索完成，共 ' + filteredData.length + ' 条记录', 'success');
-        }
-
-        function openImportModal() {
-            selectedFile = null;
-            document.getElementById('importFileInfo').style.display = 'none';
-            document.getElementById('importModal').classList.add('show');
-            document.getElementById('importOverlay').classList.add('show');
-        }
-        function closeImportModal() {
-            document.getElementById('importModal').classList.remove('show');
-            document.getElementById('importOverlay').classList.remove('show');
-        }
-        function handleFileSelect(input) {
-            if (input.files && input.files[0]) {
-                selectedFile = input.files[0];
-                document.getElementById('selectedFileName').textContent = selectedFile.name;
-                document.getElementById('importFileInfo').style.display = 'flex';
-            }
-        }
-        function clearSelectedFile() {
-            selectedFile = null;
-            document.getElementById('importFileInput').value = '';
-            document.getElementById('importFileInfo').style.display = 'none';
-        }
-        function doImport() {
-            if (!selectedFile) { showToast('请先选择文件', 'error'); return; }
-            showToast('导入功能演示：' + selectedFile.name, 'success');
-            closeImportModal();
-        }
-
-        function openExportModal() {
-            document.getElementById('exportModal').classList.add('show');
-            document.getElementById('exportOverlay').classList.add('show');
-        }
-        function closeExportModal() {
-            document.getElementById('exportModal').classList.remove('show');
-            document.getElementById('exportOverlay').classList.remove('show');
-        }
-        function exportData() { openExportModal(); }
-        function doExport() {
-            var scope = document.getElementById('exportScope').value;
-            var dataToExport = scope === 'filtered' ? filteredData : allData;
-            var csv = '\ufeff工单号\t工单优先级';
-            dataToExport.forEach(function(d) { csv += d.workOrderNo + '\t' + d.workOrderPriority + ''; });
+        function exportData() {
+            var vf = currentColumnConfig.filter(function(c){ return c.visible; });
+            var csv = '\ufeff' + vf.map(function(c){ return c.name; }).join('\t') + '\n';
+            filteredData.forEach(function(d) { csv += vf.map(function(c) { var v = d[c.field]; return v !== undefined && v !== null ? v : ''; }).join('\t') + '\n'; });
             var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-            var a = document.createElement('a');
-            a.href = URL.createObjectURL(b);
-            a.download = '工单优先级_' + new Date().toISOString().split('T')[0] + '.csv';
-            a.click();
-            showToast('导出成功，共 ' + dataToExport.length + ' 条记录', 'success');
-            closeExportModal();
+            var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+            a.download = '工单优先级_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
+            showToast('导出成功', 'success');
         }
 
         function showToast(m, tp) {
             var t = document.getElementById('toast');
             t.querySelector('.toast-message').textContent = m;
-            t.querySelector('.toast-icon').textContent = tp === 'success' ? '✓' : '✕';
-            t.className = 'toast ' + tp + ' show';
+            t.className = 'toast ' + (tp || 'success') + ' show';
             setTimeout(function(){ t.classList.remove('show'); }, 2500);
         }
 
+        // 高级搜索
+        function openAdvSearch() {
+            document.getElementById('advSearchOverlay').classList.add('show');
+            document.getElementById('advSearchModal').classList.add('show');
+        }
+        function closeAdvSearch() {
+            document.getElementById('advSearchOverlay').classList.remove('show');
+            document.getElementById('advSearchModal').classList.remove('show');
+        }
+        function resetAdvSearch() {
+            ['adv_createDateFrom','adv_createDateTo','adv_updateDateFrom','adv_updateDateTo','adv_priorityMin','adv_priorityMax'].forEach(function(id){ document.getElementById(id).value = ''; });
+        }
+        function applyAdvSearch() {
+            var cdf = document.getElementById('adv_createDateFrom').value;
+            var cdt = document.getElementById('adv_createDateTo').value;
+            var udf = document.getElementById('adv_updateDateFrom').value;
+            var udt = document.getElementById('adv_updateDateTo').value;
+            var pmin = document.getElementById('adv_priorityMin').value;
+            var pmax = document.getElementById('adv_priorityMax').value;
+            filteredData = allData.filter(function(d) {
+                if (cdf && d.createDate < cdf) return false;
+                if (cdt && d.createDate > cdt) return false;
+                if (udf && d.updateDate < udf) return false;
+                if (udt && d.updateDate > udt) return false;
+                if (pmin && parseInt(d.workOrderPriority) < parseInt(pmin)) return false;
+                if (pmax && parseInt(d.workOrderPriority) > parseInt(pmax)) return false;
+                return true;
+            });
+            currentPage = 1; renderTable();
+            closeAdvSearch();
+            showToast('高级搜索完成，共 ' + filteredData.length + ' 条记录');
+        }
+
+        // 自定义列
+        function openColumnConfig() { ColumnConfigTransfer.open(); }
+
+        // 初始化穿梭框组件
+        ColumnConfigTransfer.init(
+            tableFields,
+            function(newDefs) {
+                currentColumnConfig = newDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function() {
+                currentColumnConfig = tableFields.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function(savedDefs) {
+                currentColumnConfig = savedDefs.map(function(f){ return Object.assign({},f); });
+                try { localStorage.setItem('C2_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
+                renderTable();
+            }
+        );
+
         init();
-        TabManager.init();
+
+        // 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套规则配置': { url: 'C1-config-rules.html' },
+            '工单优先级维护': { url: 'C2-priority.html' },
+            '组件责任方配置': { url: 'C3-responsible-party.html' },
+            '供给PO信息': { url: 'T1-po-report.html' },
+            '供给PR信息': { url: 'T2-pr-info.html' },
+            '供给WO信息': { url: 'wo-supply.html' },
+            '齐套计算': { url: '../index.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
 </body>
 </html>

@@ -31,11 +31,11 @@
         .tab-item.active .tab-close { opacity: 0.8; }
         .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        
+        
+        
+        
+        
         .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
@@ -44,11 +44,11 @@
         .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
-        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
-        .toolbar-breadcrumb a:hover { text-decoration: underline; }
-        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
-        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        
+        
+        
+        
+        
         .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
         .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
         .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
@@ -105,10 +105,14 @@
         .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
         .link:hover { text-decoration: underline; }
         .text-danger { color: var(--danger) !important; font-weight: 600; }
-        .progress-bar { width: 100%; height: 16px; background: var(--border-light); border-radius: 8px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 4px; }
-        .progress-bar-fill { height: 100%; background: var(--success); border-radius: 8px; transition: width 0.3s; }
-        .progress-bar-fill.warn { background: var(--warning); }
-        .progress-bar-fill.danger { background: var(--danger); }
+        /* 进度环（替换进度条） — 强调色 #4285f4 + 灰色 #e8e8e8 */
+        .progress-ring-cell { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+        .progress-ring { width: 32px; height: 32px; transform: rotate(-90deg); flex-shrink: 0; }
+        .progress-ring-bg { fill: none; stroke: var(--border-light); stroke-width: 3; }
+        .progress-ring-fill { fill: none; stroke: #4285f4; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.4s ease; }
+        .progress-ring-fill.warn { stroke: var(--warning); }
+        .progress-ring-fill.danger { stroke: var(--danger); }
+        .progress-ring-text { font-size: 11px; font-weight: 600; color: var(--text); white-space: nowrap; }
         .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
         .pagination { display: flex; align-items: center; gap: 8px; }
         .page-info { padding: 0 8px; }
@@ -138,7 +142,7 @@
         .condition-delete:hover { background: var(--danger-bg); }
         .drawer-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 1100; }
         .drawer-overlay.show { display: block; }
-        .drawer { position: fixed; top: 0; right: 0; width: 60%; max-width: 800px; height: 100%; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 1101; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
+        .drawer { position: fixed; top: 0; right: 0; width: 650px; max-width: 800px; height: 100%; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 1101; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
         .drawer.show { transform: translateX(0); }
         .drawer-header { height: 48px; padding: 0 20px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .drawer-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
@@ -180,9 +184,8 @@
             <div class="stat-tools">
                 <button class="stat-tool-btn" onclick="openAdvSearch()" title="高级搜索">🔍</button>
                 <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
-                <div class="stat-action-btns">
-                    <button class="btn btn-sm btn-link" onclick="showToast('列宽已重置','success')">重置列宽</button>
-                </div>
+                <button class="btn btn-sm" onclick="showToast('列宽已重置','success')">重置列宽</button>
+                <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
             </div>
         </div>
         <div class="table-container">
@@ -204,9 +207,9 @@
     </div>
 
     <!-- 自定义列 -->
-    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
-    <div class="modal" id="columnModal" style="width:480px;">
-        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
+        <!-- 自定义列 -->
+    <div class="modal-overlay" id="colOverlay"></div>
+    <div class="modal" id="columnModal"></div>
         <div class="modal-body"><div class="column-list" id="columnList"></div></div>
         <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
     </div>
@@ -227,7 +230,7 @@
         <div class="drawer-footer"><button class="btn btn-sm" onclick="closeDrawer()">关闭</button></div>
     </div>
 
-    <script src="../../js/tab-manager.js"></script><script>
+    <script src="../../js/tab-manager.js"></script><script src="../../js/column-config-transfer.js"></script><script>
         // SPEC.md 屏幕10: M2 工单齐套-工单详情 - 38个字段
         var fieldDefs = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},
@@ -458,8 +461,10 @@
                         h += '<td class="'+tc+'"><span class="badge '+stc+'">'+(v||'')+'</span></td>';
                     } else if (c.field==='kitProgress') {
                         var pct = parseFloat(v||0);
+                        var r = 12, circ = 2 * Math.PI * r;
+                        var offset = circ - (pct / 100) * circ;
                         var cls = pct>=80?'':(pct>=50?'warn':'danger');
-                        h += '<td class="'+tc+'"><div class="progress-bar"><div class="progress-bar-fill '+cls+'" style="width:'+pct+'%"></div></div>'+v+'</td>';
+                        h += '<td class="'+tc+'"><span class="progress-ring-cell"><svg class="progress-ring" viewBox="0 0 32 32"><circle class="progress-ring-bg" cx="16" cy="16" r="'+r+'"/><circle class="progress-ring-fill '+cls+'" cx="16" cy="16" r="'+r+'" style="stroke-dasharray:'+circ+';stroke-dashoffset:'+offset+';"/></svg><span class="progress-ring-text">'+v+'</span></span></td>';
                     } else {
                         h += '<td class="'+tc+'">'+(v!==undefined?v:'')+'</td>';
                     }
@@ -553,19 +558,25 @@
         function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
         function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
 
-        function openColumnConfig() { renderColumnList(); document.getElementById('columnModal').classList.add('show'); document.getElementById('colOverlay').classList.add('show'); }
-        function closeColumnConfig() { document.getElementById('columnModal').classList.remove('show'); document.getElementById('colOverlay').classList.remove('show'); }
-        function renderColumnList() {
-            var h = '';
-            fieldDefs.forEach(function(f, i) {
-                var ck = currentColumnConfig[i] && currentColumnConfig[i].visible ? 'checked' : '';
-                h += '<label class="column-item"><input type="checkbox" '+ck+' onchange="toggleColVis('+i+',this.checked)"><span>'+f.name+'</span></label>';
-            });
-            document.getElementById('columnList').innerHTML = h;
-        }
-        function toggleColVis(i, v) { if (fieldDefs[i].systemFixed) return; if (currentColumnConfig[i]) currentColumnConfig[i].visible = v; renderTable(); }
-        function resetColumnConfig() { currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); }); renderColumnList(); renderTable(); showToast('已恢复默认列配置'); }
-        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用'); }
+                function openColumnConfig() { ColumnConfigTransfer.open(); }
+
+        // 初始化穿梭框组件
+        ColumnConfigTransfer.init(
+            fieldDefs,
+            function(newDefs) {
+                currentColumnConfig = newDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function() {
+                currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function(savedDefs) {
+                currentColumnConfig = savedDefs.map(function(f){ return Object.assign({},f); });
+                try { localStorage.setItem('M2_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
+                renderTable();
+            }
+        );
 
         function openAdvSearch() {
             if (document.getElementById('advConditionList').children.length === 0) addAdvCondition();
@@ -655,7 +666,21 @@
         function closeDrawer() { document.getElementById('woDrawer').classList.remove('show'); document.getElementById('drawerOverlay').classList.remove('show'); }
 
         init();
-TabManager.init();
+// 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套规则配置': { url: 'C1-config-rules.html' },
+            '工单优先级维护': { url: 'C2-priority.html' },
+            '组件责任方配置': { url: 'C3-responsible-party.html' },
+            '供给PO信息': { url: 'T1-po-report.html' },
+            '供给PR信息': { url: 'T2-pr-info.html' },
+            '供给WO信息': { url: 'wo-supply.html' },
+            '齐套计算': { url: '../index.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
 </body>
 </html>

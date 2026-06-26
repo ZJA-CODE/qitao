@@ -20,11 +20,11 @@
         .tab-item.active .tab-close { opacity: 0.8; }
         .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        
+        
+        
+        
+        
         .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
@@ -33,11 +33,11 @@
         .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
-        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
-        .toolbar-breadcrumb a:hover { text-decoration: underline; }
-        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
-        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        
+        
+        
+        
+        
         .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
         .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
         .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
@@ -194,7 +194,7 @@
         </div>
     </div>
 
-    <script src="../../js/tab-manager.js"></script><script>
+    <script src="../../js/tab-manager.js"></script><script src="../../js/column-config-transfer.js"></script><script>
         // C3屏幕字段定义（按照SPEC.md）
         var tableFields = [
             {field: 'componentCategory', name: '零部件类别', width: 140, queryable: true, queryType: 'SEL_2', editable: true, editableType: 'select'},
@@ -542,7 +542,46 @@
         // 初始化
         generateMockData();
         renderTable();
-TabManager.init();
+
+        // 自定义列配置
+        var fieldDefs = tableFields.map(function(f) {
+            return { field: f.field, name: f.name, visible: true, leftSticky: f.field === 'componentCategory' };
+        });
+        var currentColumnConfig = fieldDefs.map(function(f) { return Object.assign({}, f); });
+
+        function openColumnConfig() { ColumnConfigTransfer.open(); }
+
+        ColumnConfigTransfer.init(
+            fieldDefs,
+            function(newDefs) {
+                currentColumnConfig = newDefs.map(function(f) { return Object.assign({}, f); });
+                renderTable();
+            },
+            function() {
+                currentColumnConfig = fieldDefs.map(function(f) { return Object.assign({}, f); });
+                renderTable();
+            },
+            function(savedDefs) {
+                currentColumnConfig = savedDefs.map(function(f) { return Object.assign({}, f); });
+                try { localStorage.setItem('C3_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
+                renderTable();
+            }
+        );
+// 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套规则配置': { url: 'C1-config-rules.html' },
+            '工单优先级维护': { url: 'C2-priority.html' },
+            '组件责任方配置': { url: 'C3-responsible-party.html' },
+            '供给PO信息': { url: 'T1-po-report.html' },
+            '供给PR信息': { url: 'T2-pr-info.html' },
+            '供给WO信息': { url: 'wo-supply.html' },
+            '齐套计算': { url: '../index.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
 </body>
 </html>

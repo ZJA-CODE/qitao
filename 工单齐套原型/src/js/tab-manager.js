@@ -277,11 +277,44 @@ const TabManager = {
 
     // ========== 初始化 ==========
 
-    init() {
+    init(navConfig) {
+        var self = this;
         var title = this.getCurrentTitle();
         this.openTab(title);
+
+        // If navConfig is provided, ensure all navigable pages are in tabs
+        if (navConfig && typeof navConfig === 'object') {
+            var tabs = this.getTabs();
+            var currentFile = this.getCurrentFileName();
+
+            // Add missing pages to tab list (but don't navigate)
+            Object.keys(navConfig).forEach(function(pageTitle) {
+                var cfg = navConfig[pageTitle];
+                var file = cfg.file || cfg.url;
+                // Normalize file - remove path prefixes
+                var basename = file.split('/').pop();
+                var existing = tabs.filter(function(t) { return t.file === basename; })[0];
+                if (!existing && basename !== currentFile) {
+                    var id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5) + pageTitle;
+                    tabs.push({ id: id, file: basename, title: pageTitle });
+                }
+            });
+            this.saveTabs(tabs);
+        }
+
         this.renderNavTabs();
-    }
+    },
+
+    // Navigate to a page by title using navConfig
+    navigateByTitle(title, navConfig) {
+        if (navConfig && navConfig[title]) {
+            var cfg = navConfig[title];
+            var url = cfg.url || cfg.file;
+            if (url) {
+                window.location.href = url;
+            }
+        }
+    },
 };
 
 // 确保页签样式正确（与页面CSS兼容）

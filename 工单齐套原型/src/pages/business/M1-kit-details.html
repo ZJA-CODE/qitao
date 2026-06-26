@@ -31,11 +31,11 @@
         .tab-item.active .tab-close { opacity: 0.8; }
         .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
+        
+        
+        
+        
+        
         .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
@@ -44,11 +44,11 @@
         .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
-        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
-        .toolbar-breadcrumb a:hover { text-decoration: underline; }
-        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
-        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
+        
+        
+        
+        
+        
         .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
         .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
         .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
@@ -107,8 +107,8 @@
         .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
         .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
         .link:hover { text-decoration: underline; }
-        .supply-link { color: var(--warning); font-weight: 600; margin-right: 4px; cursor: pointer; }
-        .supply-link:hover { text-decoration: underline; }
+        .supply-link { color: #4285f4; font-weight: 600; margin-right: 4px; cursor: pointer; background: #e8f0fe; padding: 2px 8px; border-radius: 10px; border: 1px solid #c2d4f7; display: inline-block; }
+        .supply-link:hover { background: #d2e3fc; text-decoration: none; }
         .text-danger { color: var(--danger) !important; font-weight: 600; }
         .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
         .pagination { display: flex; align-items: center; gap: 8px; }
@@ -139,7 +139,7 @@
         .condition-delete:hover { background: var(--danger-bg); }
         .drawer-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.45); z-index: 1100; }
         .drawer-overlay.show { display: block; }
-        .drawer { position: fixed; top: 0; right: 0; width: 60%; max-width: 800px; height: 100%; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 1101; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
+        .drawer { position: fixed; top: 0; right: 0; width: 650px; max-width: 800px; height: 100%; background: var(--bg-white); box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 1101; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
         .drawer.show { transform: translateX(0); }
         .drawer-header { height: 48px; padding: 0 20px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
         .drawer-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
@@ -194,13 +194,12 @@
         <div class="stat-cards">
             <button class="stat-btn stat-full" id="statFull" onclick="filterByKit('full')"><span class="stat-value" id="statFullVal">0</span><span>齐套</span></button>
             <button class="stat-btn stat-empty" id="statEmpty" onclick="filterByKit('empty')"><span class="stat-value" id="statEmptyVal">0</span><span>不齐套</span></button>
-            <div class="stat-tools">
-                <button class="stat-tool-btn" onclick="openAdvSearch()" title="高级搜索">🔍</button>
-                <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
-                <div class="stat-action-btns">
-                    <button class="btn btn-sm btn-link" onclick="showToast('列宽已重置','success')">重置列宽</button>
+                <div class="stat-tools">
+                    <button class="stat-tool-btn" onclick="openAdvSearch()" title="高级搜索">🔍</button>
+                    <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
+                    <button class="btn btn-sm" onclick="showToast('列宽已重置','success')">重置列宽</button>
+                    <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
                 </div>
-            </div>
         </div>
         <div class="table-container">
             <div class="table-wrapper">
@@ -221,12 +220,8 @@
     </div>
 
     <!-- 自定义列 -->
-    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
-    <div class="modal" id="columnModal" style="width:480px;">
-        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
-        <div class="modal-body"><div class="column-list" id="columnList"></div></div>
-        <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
-    </div>
+    <div class="modal-overlay" id="colOverlay"></div>
+    <div class="modal" id="columnModal"></div>
 
     <!-- 高级搜索 -->
     <div class="modal-overlay" id="advOverlay" onclick="closeAdvSearch()"></div>
@@ -244,7 +239,15 @@
         <div class="drawer-footer"><button class="btn btn-sm" onclick="closeDrawer()">关闭</button><button class="btn btn-primary btn-sm" onclick="showToast('已跳转','success')">查看详情</button></div>
     </div>
 
-    <script src="../../js/tab-manager.js"></script><script>
+    <!-- T3 替代料及库存 抽屉 -->
+    <div class="drawer-overlay" id="altOverlay" onclick="closeAltDrawer()"></div>
+    <div class="drawer" id="altDrawer">
+        <div class="drawer-header"><span class="drawer-title">🔄 T3 替代料及库存明细</span><button class="drawer-close" onclick="closeAltDrawer()">×</button></div>
+        <div class="drawer-body" id="altBody"></div>
+        <div class="drawer-footer"><button class="btn btn-sm" onclick="closeAltDrawer()">关闭</button><button class="btn btn-primary btn-sm" onclick="exportAltData()">📥 导出</button></div>
+    </div>
+
+    <script src="../../js/tab-manager.js"></script><script src="../../js/column-config-transfer.js"></script><script>
         // SPEC.md 屏幕9: M1 工单齐套明细 - 62个字段
         var fieldDefs = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},
@@ -484,7 +487,7 @@
                         var nv = parseInt(v||0);
                         h += '<td class="'+tc+'"><span class="'+(nv<0?'text-danger':'')+'">'+(v||'0')+'</span></td>';
                     } else if (c.field==='alternativeMaterialStock') {
-                        h += '<td class="'+tc+'">'+(v?'<a class="link" onclick="openAltMaterialDrawer(\''+d.componentMaterialCode+'\')">替代料</a>':'-')+'</td>';
+                        h += '<td class="'+tc+'">'+(v?'<a class="link" onclick="openAltDrawer(\''+d.orgName+'\',\''+d.materialCode+'\',\''+d.componentMaterialCode+'\',\''+d.componentMaterialDesc+'\')">替代料</a>':'-')+'</td>';
                     } else if (c.field==='workOrderStatus') {
                         var stc = v==='完工'?'badge-success':(v==='进行中'?'badge-warning':'badge-danger');
                         h += '<td class="'+tc+'"><span class="badge '+stc+'">'+(v||'')+'</span></td>';
@@ -584,19 +587,28 @@
         function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
         function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
 
-        function openColumnConfig() { renderColumnList(); document.getElementById('columnModal').classList.add('show'); document.getElementById('colOverlay').classList.add('show'); }
-        function closeColumnConfig() { document.getElementById('columnModal').classList.remove('show'); document.getElementById('colOverlay').classList.remove('show'); }
-        function renderColumnList() {
-            var h = '';
-            fieldDefs.forEach(function(f, i) {
-                var ck = currentColumnConfig[i] && currentColumnConfig[i].visible ? 'checked' : '';
-                h += '<label class="column-item"><input type="checkbox" '+ck+' onchange="toggleColVis('+i+',this.checked)"><span>'+f.name+'</span></label>';
-            });
-            document.getElementById('columnList').innerHTML = h;
-        }
-        function toggleColVis(i, v) { if (fieldDefs[i].systemFixed) return; if (currentColumnConfig[i]) currentColumnConfig[i].visible = v; renderTable(); }
-        function resetColumnConfig() { currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); }); renderColumnList(); renderTable(); showToast('已恢复默认列配置', 'success'); }
-        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用', 'success'); }
+        function openColumnConfig() { ColumnConfigTransfer.open(); }
+
+        // 初始化穿梭框组件
+        ColumnConfigTransfer.init(
+            fieldDefs,
+            function(newDefs) {
+                // Apply callback
+                currentColumnConfig = newDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function() {
+                // Reset callback
+                currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function(savedDefs) {
+                // Save callback - persist to localStorage
+                currentColumnConfig = savedDefs.map(function(f){ return Object.assign({},f); });
+                try { localStorage.setItem('M1_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
+                renderTable();
+            }
+        );
 
         function openAdvSearch() {
             if (document.getElementById('advConditionList').children.length === 0) addAdvCondition();
@@ -674,19 +686,81 @@
             openDrawer('🛒 PO信息 - ' + materialCode, html);
         }
 
-        function openAltMaterialDrawer(materialCode) {
-            var html = '<div class="detail-section"><div class="detail-section-title">替代料信息（料号: '+materialCode+'）</div>';
-            html += '<table class="data-table" style="width:100%;"><thead><tr><th>替代料号</th><th>物料描述</th><th>供应商</th><th>库存数量</th><th>单位</th><th>是否可用</th></tr></thead><tbody>';
-            var alts = [{code:'ALT-A001',desc:'替代芯片-1',sup:'南京华天',qty:'2000'},{code:'ALT-A002',desc:'替代芯片-2',sup:'北京中芯',qty:'1500'}];
+        /* ===== T3 替代料及库存 抽屉（按SPEC.md 屏幕19） ===== */
+        function openAltDrawer(orgName, materialCode, componentMaterialCode, materialDes) {
+            var html = '';
+            // --- Head 区域 ---
+            html += '<div class="detail-section">';
+            html += '<div class="detail-section-title">📋 基本信息</div>';
+            html += '<div class="detail-grid">';
+            html += '<div class="detail-item"><div class="detail-label">组织</div><div class="detail-value">'+(orgName||'-')+'</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">料号</div><div class="detail-value">'+(materialCode||'-')+'</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">组件物料</div><div class="detail-value">'+(componentMaterialCode||'-')+'</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">说明</div><div class="detail-value">'+(materialDes||'-')+'</div></div>';
+            html += '<div class="detail-item"><div class="detail-label">替代项</div><div class="detail-value"><select style="height:30px;border:1px solid var(--border);border-radius:4px;padding:0 6px;font-size:13px;"><option selected>Alternate</option><option>None</option></select></div></div>';
+            html += '<div class="detail-item"><div class="detail-label">版本</div><div class="detail-value"><select style="height:30px;border:1px solid var(--border);border-radius:4px;padding:0 6px;font-size:13px;"><option selected>0</option><option>1</option><option>2</option></select></div></div>';
+            html += '</div></div>';
+            // --- Item 区域（替代料明细表） ---
+            html += '<div class="detail-section">';
+            html += '<div class="detail-section-title">📦 替代料明细</div>';
+            html += '<table class="data-table" style="width:100%;"><thead><tr>';
+            html += '<th>料号</th><th>品牌</th><th>描述</th><th>状态</th><th>L/T</th>';
+            html += '<th>可用数量</th><th>客户预留数量</th><th>现存数量</th><th>工单可用数量</th>';
+            html += '<th>保留数量</th><th>单据保留数量</th><th>是否资源</th><th>产品线</th><th>批次</th><th>供给明细</th>';
+            html += '</tr></thead><tbody>';
+            var alts = [
+                {code:'ALT-A001',brand:'Intel',desc:'替代芯片-1',status:'启用',lt:'14',availQty:'2000',custRes:'200',onHand:'2500',woAvail:'1800',reserved:'500',docRes:'300',isRes:'否',pl:'PL-A',lot:'LOT-2025-001',supply:{pr:2,po:3,wo:1}},
+                {code:'ALT-A002',brand:'AMD',desc:'替代芯片-2',status:'启用',lt:'21',availQty:'1500',custRes:'100',onHand:'1800',woAvail:'1400',reserved:'300',docRes:'150',isRes:'否',pl:'PL-B',lot:'LOT-2025-002',supply:{pr:1,po:2,wo:0}},
+                {code:'ALT-B001',brand:'Samsung',desc:'替代电容-1',status:'启用',lt:'7',availQty:'5000',custRes:'500',onHand:'6000',woAvail:'4500',reserved:'1000',docRes:'500',isRes:'否',pl:'PL-A',lot:'LOT-2025-003',supply:{pr:0,po:5,wo:2}},
+            ];
             alts.forEach(function(a){
-                html += '<tr><td>'+a.code+'</td><td>'+a.desc+'</td><td>'+a.sup+'</td><td>'+a.qty+'</td><td>PCS</td><td><span class="badge badge-success">可用</span></td></tr>';
+                html += '<tr>';
+                html += '<td>'+a.code+'</td><td>'+a.brand+'</td><td>'+a.desc+'</td>';
+                html += '<td><span class="badge badge-success">'+a.status+'</span></td>';
+                html += '<td>'+a.lt+'天</td>';
+                html += '<td>'+a.availQty+'</td><td>'+a.custRes+'</td><td>'+a.onHand+'</td><td>'+a.woAvail+'</td>';
+                html += '<td>'+a.reserved+'</td><td>'+a.docRes+'</td>';
+                html += '<td>'+a.isRes+'</td><td>'+a.pl+'</td><td>'+a.lot+'</td>';
+                html += '<td>';
+                html += '<span class="supply-link" onclick="window.location.href=\'../supply/T2-pr-info.html?materialCode='+a.code+'\'">PR:'+a.supply.pr+'</span> ';
+                html += '<span class="supply-link" onclick="window.location.href=\'../supply/T1-po-report.html?materialCode='+a.code+'\'">PO:'+a.supply.po+'</span>';
+                html += '</td>';
+                html += '</tr>';
             });
             html += '</tbody></table></div>';
-            openDrawer('🔄 替代料 - ' + materialCode, html);
+            // 渲染到专属抽屉
+            document.getElementById('altBody').innerHTML = html;
+            document.getElementById('altDrawer').classList.add('show');
+            document.getElementById('altOverlay').classList.add('show');
+        }
+        function closeAltDrawer() {
+            document.getElementById('altDrawer').classList.remove('show');
+            document.getElementById('altOverlay').classList.remove('show');
+        }
+        function exportAltData() {
+            showToast('替代料数据导出成功', 'success');
+        }
+        // 兼容旧方法，重定向到新抽屉
+        function openAltMaterialDrawer(materialCode) {
+            openAltDrawer('深圳工厂', materialCode, materialCode, '替代料-' + materialCode);
         }
 
         init();
-TabManager.init();
+// 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套规则配置': { url: 'C1-config-rules.html' },
+            '工单优先级维护': { url: 'C2-priority.html' },
+            '组件责任方配置': { url: 'C3-responsible-party.html' },
+            '供给PO信息': { url: 'T1-po-report.html' },
+            '供给PR信息': { url: 'T2-pr-info.html' },
+            '供给WO信息': { url: 'wo-supply.html' },
+            '齐套计算': { url: '../index.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
 </body>
 </html>

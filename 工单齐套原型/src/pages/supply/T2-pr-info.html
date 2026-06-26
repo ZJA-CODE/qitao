@@ -20,45 +20,26 @@
         .tab-item.active .tab-close { opacity: 0.8; }
         .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
-        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
-        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
-.toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
         .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
         .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-integrated { display: flex; align-items: stretch; min-height: 0; }
+        .toolbar-search-section { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; padding-right: 16px; }
+        .toolbar-actions-section { display: flex; flex-direction: column; justify-content: center; align-items: flex-end; padding: 4px 0; gap: 6px; flex-shrink: 0; }
+        .toolbar-actions-top { display: flex; gap: 6px; align-items: center; }
         .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .toolbar-breadcrumb { font-size: 13px; color: var(--text-secondary); margin-right: 8px; white-space: nowrap; }
-        .toolbar-breadcrumb a { color: #4285f4; text-decoration: none; font-weight: 500; }
-        .toolbar-breadcrumb a:hover { text-decoration: underline; }
-        .toolbar-breadcrumb .sep { color: var(--text-muted); margin: 0 4px; }
-        .toolbar-breadcrumb .current { color: #4285f4; font-weight: 600; }
-        .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
         .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
         .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
-        .toolbar-query .query-item input,
-        .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
+        .toolbar-query .query-item input, .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
         .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
         .toolbar-query .query-label.required::after { content: " *"; color: var(--danger); }
-        .query-bar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0; }
-        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-        .query-item input, .query-item select { height: 30px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; }
-        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-        .query-label { color: var(--text-secondary); white-space: nowrap; }
-        .stat-cards { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-        .stat-cards .stat-tools { display: flex; gap: 8px; margin-left: auto; align-items: center; }
-        .stat-tool-btn { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-white); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
-        .stat-tool-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; white-space: nowrap; }
+        .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
         .btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: white; }
         .btn-sm { height: 26px; padding: 4px 10px; font-size: 12px; }
+        .btn-export { background: var(--success); border-color: var(--success); color: white; font-weight: 600; }
+        .btn-export:hover { background: #73d13d; border-color: #73d13d; color: white; }
         .table-container { flex: 1; min-height: 0; padding: 16px 20px; display: flex; flex-direction: column; overflow: hidden; }
         .table-wrapper { flex: 1; min-height: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); }
         .table-scroll { flex: 1; min-height: 0; overflow: auto; }
@@ -90,36 +71,51 @@
         .toast.show { transform: translateX(0); }
         .toast.success { border-left: 3px solid var(--success); }
         .toast-icon { font-size: 16px; color: var(--success); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
         .modal-overlay.show { display: block; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; width: 850px; }
         .modal.show { display: flex; }
         .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
         .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
         .modal-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--border-light); color: var(--text); }
         .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
         .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
         .footer-actions { display: flex; gap: 8px; }
-        .column-list { display: flex; flex-direction: column; gap: 2px; max-height: 400px; overflow-y: auto; }
-        .column-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; font-size: 13px; border-radius: var(--radius-sm); }
-        .column-item:hover { background: var(--bg); }
-        .column-item input { width: 16px; height: 16px; accent-color: var(--primary); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     </style>
 </head>
 <body>
     <div class="toast" id="toast"><span class="toast-icon">✓</span><span class="toast-message"></span></div>
-        <header class="app-header">
+    <header class="app-header">
         <div class="app-title">工单齐套管理系统</div>
         <div class="tab-bar"></div>
     </header>
     <div class="page-container">
-        <div class="unified-toolbar">            <div class="toolbar-row">                <span class="toolbar-page-title">T2 供给PR信息</span>                <div class="toolbar-actions">                    <button class="btn btn-sm" onclick="openAdvSearch()">🔍 高级搜索</button><button class="btn btn-sm" onclick="openColumnConfig()">⚙ 自定义列</button><button class="btn btn-sm btn-primary" onclick="exportData()">📤 导出</button>                </div>            </div>            <div class="toolbar-query">                <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select>
-            </div>                <div class="query-item"><span class="query-label">PR单号</span><input type="text" id="q_prNo" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">料号</span><input type="text" id="q_materialCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">供应商编码</span><input type="text" id="q_supplierCode" placeholder="多条件逗号分隔"></div>                <div class="query-item"><span class="query-label">需求日期</span><input type="date" id="q_requiredDate"></div>                <div class="query-item"><span class="query-label">PR状态</span><select id="q_prStatus"><option value="">全部</option><option>待审批</option><option>已审批</option><option>已转PO</option><option>已关闭</option></select></div>                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>                <button class="btn btn-sm" onclick="resetQuery()">重置</button>            </div>        </div><div class="stat-cards">
-            <div class="stat-tools">
-                
+        <div class="unified-toolbar">
+            <div class="toolbar-integrated">
+                <div class="toolbar-search-section">
+                    <div class="toolbar-page-title">T2 供给PR信息</div>
+                    <div class="toolbar-query">
+                        <div class="query-item"><span class="query-label">组织</span><select id="q_orgName"><option value="">全部</option><option>深圳工厂</option><option>上海工厂</option><option>北京工厂</option><option>成都工厂</option></select></div>
+                        <div class="query-item"><span class="query-label">PR单号</span><input type="text" id="q_prNo" placeholder="多条件逗号分隔"></div>
+                        <div class="query-item"><span class="query-label">料号</span><input type="text" id="q_materialCode" placeholder="多条件逗号分隔"></div>
+                        <div class="query-item"><span class="query-label">供应商编码</span><input type="text" id="q_supplierCode" placeholder="多条件逗号分隔"></div>
+                        <div class="query-item"><span class="query-label">需求日期</span><input type="date" id="q_requiredDate"></div>
+                        <div class="query-item"><span class="query-label">PR状态</span><select id="q_prStatus"><option value="">全部</option><option>待审批</option><option>已审批</option><option>已转PO</option><option>已关闭</option></select></div>
+                        <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>
+                        <button class="btn btn-sm" onclick="resetQuery()">重置</button>
+                    </div>
+                </div>
+                <div class="toolbar-actions-section">
+                    <div class="toolbar-actions-top">
+                        <button class="btn btn-sm btn-icon" onclick="openAdvSearch()" title="高级搜索">🔍</button>
+                        <button class="btn btn-sm btn-icon" onclick="openColumnConfig()" title="自定义列">⚙</button>
+                        <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="table-container">
@@ -139,14 +135,36 @@
             </div>
         </div>
     </div>
-    <div class="modal-overlay" id="colOverlay" onclick="closeColumnConfig()"></div>
-    <div class="modal" id="columnModal" style="width:480px;">
-        <div class="modal-header"><h3>自定义列显示</h3><button class="modal-close" onclick="closeColumnConfig()">×</button></div>
-        <div class="modal-body"><div class="column-list" id="columnList"></div></div>
-        <div class="modal-footer"><button class="btn btn-sm" onclick="resetColumnConfig()">↺ 恢复默认</button><div class="footer-actions"><button class="btn btn-sm" onclick="closeColumnConfig()">取消</button><button class="btn btn-primary btn-sm" onclick="applyColumnConfig()">确认</button></div></div>
+
+    <!-- 自定义列 -->
+    <div class="modal-overlay" id="colOverlay"></div>
+    <div class="modal" id="columnModal"></div>
+
+    <!-- 高级搜索 -->
+    <div class="modal-overlay" id="advSearchOverlay" onclick="closeAdvSearch()"></div>
+    <div class="modal" id="advSearchModal" style="width:600px;">
+        <div class="modal-header"><h3>高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
+        <div class="modal-body">
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">请购人</span><input type="text" id="adv_requester" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="输入请购人"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">采购员</span><input type="text" id="adv_buyer" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="输入采购员"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期起</span><input type="date" id="adv_createDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期止</span><input type="date" id="adv_createDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">请购部门</span><input type="text" id="adv_dept" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="输入部门"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-sm" onclick="resetAdvSearch()">重置</button>
+            <div class="footer-actions">
+                <button class="btn btn-sm" onclick="closeAdvSearch()">取消</button>
+                <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">搜索</button>
+            </div>
+        </div>
     </div>
-    <script src="../../js/tab-manager.js"></script><script>
-        // SPEC.md T2 - PR信息表 - 20个字段
+
+    <script src="../../js/tab-manager.js"></script>
+    <script src="../../js/column-config-transfer.js"></script>
+    <script>
         var fieldDefs = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},
             {field:'orgName',name:'组织',visible:true},
@@ -290,8 +308,8 @@
         }
         function exportData() {
             var vf = currentColumnConfig.filter(function(c){ return c.visible && c.field !== 'operations'; });
-            var csv = '\ufeff' + vf.map(function(c){ return c.name; }).join('\t') + '';
-            filteredData.forEach(function(d) { csv += vf.map(function(c) { var v = d[c.field]; return v !== undefined && v !== null ? v : ''; }).join('\t') + ''; });
+            var csv = '\ufeff' + vf.map(function(c){ return c.name; }).join('\t') + '\n';
+            filteredData.forEach(function(d) { csv += vf.map(function(c) { var v = d[c.field]; return v !== undefined && v !== null ? v : ''; }).join('\t') + '\n'; });
             var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
             var a = document.createElement('a'); a.href = URL.createObjectURL(b);
             a.download = 'PR信息表_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
@@ -301,95 +319,75 @@
         function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
         function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
         function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
-        function openColumnConfig() { renderColumnList(); document.getElementById('columnModal').classList.add('show'); document.getElementById('colOverlay').classList.add('show'); }
-        function closeColumnConfig() { document.getElementById('columnModal').classList.remove('show'); document.getElementById('colOverlay').classList.remove('show'); }
-        function renderColumnList() {
-            var h = '';
-            fieldDefs.forEach(function(f, i) {
-                var ck = currentColumnConfig[i] && currentColumnConfig[i].visible ? 'checked' : '';
-                h += '<label class="column-item"><input type="checkbox" '+ck+' onchange="toggleColVis('+i+',this.checked)"><span>'+f.name+'</span></label>';
-            });
-            document.getElementById('columnList').innerHTML = h;
+
+        // 高级搜索
+        function openAdvSearch() {
+            document.getElementById('advSearchOverlay').classList.add('show');
+            document.getElementById('advSearchModal').classList.add('show');
         }
-        function toggleColVis(i, v) { if (fieldDefs[i].systemFixed) return; if (currentColumnConfig[i]) currentColumnConfig[i].visible = v; renderTable(); }
-        function resetColumnConfig() { currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); }); renderColumnList(); renderTable(); showToast('已恢复默认列配置'); }
-        function applyColumnConfig() { renderTable(); closeColumnConfig(); showToast('列配置已应用'); }
+        function closeAdvSearch() {
+            document.getElementById('advSearchOverlay').classList.remove('show');
+            document.getElementById('advSearchModal').classList.remove('show');
+        }
+        function resetAdvSearch() {
+            ['adv_requester','adv_buyer','adv_createDateFrom','adv_createDateTo','adv_dept'].forEach(function(id){ document.getElementById(id).value = ''; });
+        }
+        function applyAdvSearch() {
+            var req = document.getElementById('adv_requester').value.trim();
+            var buyer = document.getElementById('adv_buyer').value.trim();
+            var cdf = document.getElementById('adv_createDateFrom').value;
+            var cdt = document.getElementById('adv_createDateTo').value;
+            var dept = document.getElementById('adv_dept').value.trim();
+            filteredData = allData.filter(function(d) {
+                if (req && d.requester.indexOf(req) === -1) return false;
+                if (buyer && d.buyer.indexOf(buyer) === -1) return false;
+                if (cdf && d.createDate < cdf) return false;
+                if (cdt && d.createDate > cdt) return false;
+                if (dept && d.requestDept.indexOf(dept) === -1) return false;
+                return true;
+            });
+            currentPage = 1; renderTable();
+            closeAdvSearch();
+            showToast('高级搜索完成，共 ' + filteredData.length + ' 条记录');
+        }
+
+        // 自定义列
+        function openColumnConfig() { ColumnConfigTransfer.open(); }
+
+        // 初始化穿梭框组件
+        ColumnConfigTransfer.init(
+            fieldDefs,
+            function(newDefs) {
+                currentColumnConfig = newDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function() {
+                currentColumnConfig = fieldDefs.map(function(f){ return Object.assign({},f); });
+                renderTable();
+            },
+            function(savedDefs) {
+                currentColumnConfig = savedDefs.map(function(f){ return Object.assign({},f); });
+                try { localStorage.setItem('T2_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
+                renderTable();
+            }
+        );
+
         init();
-function openAdvSearch(){
-  if(document.getElementById("advConditionList").children.length===0)addAdvCondition();
-  document.getElementById("advSearchOverlay").classList.add("show");
-  document.getElementById("advSearchModal").classList.add("show");
-}
-function closeAdvSearch(){
-  document.getElementById("advSearchOverlay").classList.remove("show");
-  document.getElementById("advSearchModal").classList.remove("show");
-}
-function addAdvCondition(){
-  var fields=[{"field":"materialCode","name":"料号"},{"field":"prNo","name":"PR号"},{"field":"supplierCode","name":"供应商编码"},{"field":"buyer","name":"采购员"},{"field":"prStatus","name":"PR状态"},{"field":"createDate","name":"创建日期"},{"field":"requiredDate","name":"要求交期"}];
-  var ops=["等于","不等于","包含","不包含","大于","小于","大于等于","小于等于"];
-  var fl=fields.map(function(f){return "<option>"+f.name+"</option>";}).join("");
-  var ol=ops.map(function(o){return "<option>"+o+"</option>";}).join("");
-  var div=document.createElement("div");
-  div.className="condition-item";
-  div.style.cssText="display:flex;gap:8px;margin-bottom:8px;align-items:center;";
-  div.innerHTML='<select style="flex:2;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;">' + fl + '</select><select style="flex:1;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;">' + ol + '</select><input type="text" placeholder="输入值" style="flex:3;height:32px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:0 8px;font-size:12px;"><button class="btn btn-sm" onclick="this.parentElement.remove()" style="color:var(--danger);">×</button>';
-  document.getElementById("advConditionList").appendChild(div);
-}
-function applyAdvSearch(){
-  var items=document.querySelectorAll("#advConditionList .condition-item");
-  var conditions=[];
-  items.forEach(function(item){
-    var selects=item.querySelectorAll("select");
-    var input=item.querySelector("input");
-    var val=input.value.trim();
-    if(val){
-      var fieldObj=fields.find(function(f){return f.name===selects[0].value;});
-      conditions.push({field:fieldObj?field.field:"",op:selects[1].value,value:val});
-    }
-  });
-  if(!conditions.length){showToast("请至少填写一个条件","error");return;}
-  var results=allData.filter(function(r){
-    return conditions.every(function(c){
-      var v=String(r[c.field]||"");
-      var op=c.op,val=c.value;
-      if(op==="等于")return v===val;
-      if(op==="不等于")return v!==val;
-      if(op==="包含")return v.indexOf(val)>=0;
-      if(op==="不包含")return v.indexOf(val)<0;
-      if(op==="大于")return v>val;
-      if(op==="小于")return v<val;
-      if(op==="大于等于")return v>=val;
-      if(op==="小于等于")return v<=val;
-      return true;
-    });
-  });
-  filteredData=results;
-  currentPage=1;
-  renderTable();
-  closeAdvSearch();
-  showToast("高级搜索完成，共"+results.length+"条结果","success");
-}
-TabManager.init();
+        // 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套规则配置': { url: 'C1-config-rules.html' },
+            '工单优先级维护': { url: 'C2-priority.html' },
+            '组件责任方配置': { url: 'C3-responsible-party.html' },
+            '供给PO信息': { url: 'T1-po-report.html' },
+            '供给PR信息': { url: 'T2-pr-info.html' },
+            '供给WO信息': { url: 'wo-supply.html' },
+            '齐套计算': { url: '../index.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
-<div class="modal-overlay" id="advSearchOverlay" onclick="closeAdvSearch()"></div>
-<div class="modal" id="advSearchModal" style="width:600px;">
-  <div class="modal-header"><h3>高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
-  <div class="modal-body">
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">采购员</span><input type="text" id="adv_buyer" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="输入采购员"></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期起</span><input type="date" id="adv_createDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期止</span><input type="date" id="adv_createDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">要求交期起</span><input type="date" id="adv_requiredDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">要求交期止</span><input type="date" id="adv_requiredDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-sm" onclick="resetAdvSearch()">重置</button>
-    <div class="footer-actions">
-      <button class="btn btn-sm" onclick="closeAdvSearch()">取消</button>
-      <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">搜索</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
