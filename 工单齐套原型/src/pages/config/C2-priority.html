@@ -122,7 +122,7 @@
             </div>
         </div>
         <div class="stat-bar">
-            <span>提示：工单优先级由人工维护，优先级数值越小优先级越高（1为最高）</span>
+            <span>💡 提示：工单优先级由人工维护，优先级数值越小优先级越高（1为最高）</span>
         </div>
         <div class="table-container">
             <div class="table-wrapper">
@@ -142,34 +142,7 @@
         </div>
     </div>
 
-    <!-- 自定义列 -->
-    <div class="modal-overlay" id="colOverlay"></div>
-    <div class="modal" id="columnModal"></div>
-
-    <!-- 高级搜索 -->
-    <div class="modal-overlay" id="advSearchOverlay" onclick="closeAdvSearch()"></div>
-    <div class="modal" id="advSearchModal" style="width:600px;">
-        <div class="modal-header"><h3>高级搜索</h3><button class="modal-close" onclick="closeAdvSearch()">×</button></div>
-        <div class="modal-body">
-            <div style="display:flex;flex-direction:column;gap:14px;">
-                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期起</span><input type="date" id="adv_createDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">创建日期止</span><input type="date" id="adv_createDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">更新日期起</span><input type="date" id="adv_updateDateFrom" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">更新日期止</span><input type="date" id="adv_updateDateTo" style="flex:1;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;"></div>
-                <div style="display:flex;align-items:center;gap:8px;"><span style="width:100px;text-align:right;font-size:13px;color:var(--text-secondary);">优先级范围</span><input type="number" id="adv_priorityMin" style="width:80px;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="最小"><span style="padding:0 8px;">-</span><input type="number" id="adv_priorityMax" style="width:80px;height:30px;border:1px solid var(--border);border-radius:4px;padding:0 8px;" placeholder="最大"></div>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-sm" onclick="resetAdvSearch()">重置</button>
-            <div class="footer-actions">
-                <button class="btn btn-sm" onclick="closeAdvSearch()">取消</button>
-                <button class="btn btn-primary btn-sm" onclick="applyAdvSearch()">搜索</button>
-            </div>
-        </div>
-    </div>
-
     <script src="../../js/tab-manager.js"></script>
-    <script src="../../js/column-config-transfer.js"></script>
     <script>
         var tableFields = [
             {field:'seqNo',name:'序号',visible:true,systemFixed:true},
@@ -360,60 +333,6 @@
             t.className = 'toast ' + (tp || 'success') + ' show';
             setTimeout(function(){ t.classList.remove('show'); }, 2500);
         }
-
-        // 高级搜索
-        function openAdvSearch() {
-            document.getElementById('advSearchOverlay').classList.add('show');
-            document.getElementById('advSearchModal').classList.add('show');
-        }
-        function closeAdvSearch() {
-            document.getElementById('advSearchOverlay').classList.remove('show');
-            document.getElementById('advSearchModal').classList.remove('show');
-        }
-        function resetAdvSearch() {
-            ['adv_createDateFrom','adv_createDateTo','adv_updateDateFrom','adv_updateDateTo','adv_priorityMin','adv_priorityMax'].forEach(function(id){ document.getElementById(id).value = ''; });
-        }
-        function applyAdvSearch() {
-            var cdf = document.getElementById('adv_createDateFrom').value;
-            var cdt = document.getElementById('adv_createDateTo').value;
-            var udf = document.getElementById('adv_updateDateFrom').value;
-            var udt = document.getElementById('adv_updateDateTo').value;
-            var pmin = document.getElementById('adv_priorityMin').value;
-            var pmax = document.getElementById('adv_priorityMax').value;
-            filteredData = allData.filter(function(d) {
-                if (cdf && d.createDate < cdf) return false;
-                if (cdt && d.createDate > cdt) return false;
-                if (udf && d.updateDate < udf) return false;
-                if (udt && d.updateDate > udt) return false;
-                if (pmin && parseInt(d.workOrderPriority) < parseInt(pmin)) return false;
-                if (pmax && parseInt(d.workOrderPriority) > parseInt(pmax)) return false;
-                return true;
-            });
-            currentPage = 1; renderTable();
-            closeAdvSearch();
-            showToast('高级搜索完成，共 ' + filteredData.length + ' 条记录');
-        }
-
-        // 自定义列
-        function openColumnConfig() { ColumnConfigTransfer.open(); }
-
-        // 初始化穿梭框组件
-        ColumnConfigTransfer.init(
-            tableFields,
-            function(newDefs) {
-                currentColumnConfig = newDefs.map(function(f){ return Object.assign({},f); });
-                renderTable();
-            },
-            function() {
-                currentColumnConfig = tableFields.map(function(f){ return Object.assign({},f); });
-                renderTable();
-            },
-            function(savedDefs) {
-                currentColumnConfig = savedDefs.map(function(f){ return Object.assign({},f); });
-                try { localStorage.setItem('C2_columnConfig', JSON.stringify(savedDefs)); } catch(e) {}
-                renderTable();
-            }
-        );
 
         init();
 

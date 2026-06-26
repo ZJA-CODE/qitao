@@ -1,34 +1,39 @@
-/*! 自定义列穿梭框组件 v2.0 - 支持拖拽排序 */
+/*! 自定义列穿梭框组件 v3.0 - 支持拖拽排序 + 上下移动按钮 + 窗体优化 */
 (function() {
-    // Inject CSS
     var styleId = 'column-transfer-style';
     if (!document.getElementById(styleId)) {
         var s = document.createElement('style');
         s.id = styleId;
         s.textContent = [
-            '.transfer-container{display:flex;gap:16px;height:400px;align-items:stretch}',
-            '.transfer-panel{flex:1;display:flex;flex-direction:column;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fafbfc;min-width:260px;max-width:400px}',
+            '.transfer-container{display:flex;gap:16px;height:380px;align-items:stretch}',
+            '.transfer-panel{flex:1;display:flex;flex-direction:column;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;background:#fafbfc;min-width:240px;max-width:380px}',
             '.transfer-header{padding:10px 14px;background:#f5f7fa;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}',
             '.transfer-title{font-size:13px;font-weight:600;color:#333}',
             '.transfer-tools{display:flex;gap:4px}',
-            '.transfer-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:0;min-height:0}',
+            '.transfer-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px;min-height:0}',
             '.transfer-list-selected{background:#fff}',
-            '.transfer-item{display:flex;align-items:center;padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f5f5f5;transition:background 0.15s;width:100%}',
+            '.transfer-item{display:flex;align-items:center;padding:8px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #f5f5f5;transition:background 0.15s;width:100%;border-radius:4px;margin:1px 2px}',
             '.transfer-item:hover{background:#e6f4ff}',
             '.transfer-item input[type="checkbox"]{width:14px;height:14px;margin-right:8px;accent-color:#1677ff}',
-            '.transfer-item-selected{display:flex;align-items:center;padding:8px 10px;border-bottom:1px solid #f0f0f0;font-size:13px;background:#e6f4ff;margin:1px 2px;border-radius:4px;cursor:move;user-select:none}',
+            '.transfer-item-selected{display:flex;align-items:center;padding:6px 8px;border-bottom:1px solid #f0f0f0;font-size:13px;background:#e6f4ff;margin:1px 2px;border-radius:4px;cursor:default;user-select:none}',
             '.transfer-item-selected:hover{background:#d4e8ff}',
             '.transfer-item-selected.dragging{opacity:0.4;background:#ffe7d6;border:2px dashed #1677ff}',
             '.transfer-item-selected.drag-over{border-top:2px solid #1677ff}',
-            '.transfer-item-inner{flex:1;display:flex;align-items:center}',
-            '.transfer-item-inner input[type="checkbox"]{width:14px;height:14px;margin-right:8px;accent-color:#1677ff}',
-            '.drag-handle{cursor:grab;color:#bbb;font-size:14px;padding:0 6px;user-select:none;flex-shrink:0}',
+            '.transfer-item-inner{flex:1;display:flex;align-items:center;min-width:0}',
+            '.transfer-item-inner input[type="checkbox"]{width:14px;height:14px;margin-right:8px;accent-color:#1677ff;flex-shrink:0}',
+            '.transfer-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}',
+            '.drag-handle{cursor:grab;color:#bbb;font-size:14px;padding:0 4px;user-select:none;flex-shrink:0}',
             '.drag-handle:active{cursor:grabbing}',
+            '.order-btns{display:flex;flex-direction:column;gap:2px;flex-shrink:0;margin-left:4px}',
+            '.order-btn{width:22px;height:20px;border:1px solid #d9d9d9;background:#fff;border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#666;padding:0;line-height:1}',
+            '.order-btn:hover{border-color:#1677ff;color:#1677ff;background:#e6f4ff}',
+            '.order-btn:disabled{opacity:0.3;cursor:not-allowed;border-color:#d9d9d9;color:#d9d9d9;background:#f5f5f5}',
+            '.order-btn:disabled:hover{border-color:#d9d9d9;color:#d9d9d9;background:#f5f5f5}',
             '.cfg-tag{font-size:10px;padding:1px 6px;border-radius:8px;margin-left:4px;flex-shrink:0}',
             '.tag-fixed{background:#52c41a;color:#fff}',
             '.transfer-empty{text-align:center;color:#bbb;font-size:12px;padding:60px 0}',
-            '.transfer-buttons{display:flex;flex-direction:column;gap:10px;justify-content:center;align-self:center;padding:0 8px}',
-            '.transfer-buttons .btn-sm{width:40px;height:34px;padding:0;font-size:16px;font-weight:600}',
+            '.transfer-buttons{display:flex;flex-direction:column;gap:8px;justify-content:center;align-self:center;padding:0 4px}',
+            '.transfer-buttons .btn-sm{width:36px;height:30px;padding:0;font-size:14px;font-weight:600}',
             '.btn-xs{padding:3px 10px;font-size:12px;height:24px;border:1px solid #d9d9d9;background:#fff;border-radius:4px;cursor:pointer}',
             '.btn-xs:hover{border-color:#1677ff;color:#1677ff}'
         ].join('');
@@ -73,7 +78,7 @@
     function render() {
         var modal = document.getElementById('columnModal');
         if (!modal) return;
-        modal.style.width = '850px';
+        modal.style.width = '820px';
         modal.innerHTML = buildModalHtml();
         initDragEvents();
     }
@@ -97,7 +102,7 @@
             h += '<div class="transfer-empty">暂无可用列</div>';
         } else {
             _availableList.forEach(function(f) {
-                h += '<label class="transfer-item"><input type="checkbox" class="avail-cb" data-idx="' + f._idx + '"><span>' + f.name + '</span></label>';
+                h += '<label class="transfer-item"><input type="checkbox" class="avail-cb" data-idx="' + f._idx + '"><span class="transfer-item-name">' + f.name + '</span></label>';
             });
         }
         h += '</div></div>';
@@ -110,7 +115,7 @@
         h += '<button class="btn btn-sm" onclick="ColumnConfigTransfer.moveToLeftAll()" title="全部移到可用">«</button>';
         h += '</div>';
 
-        // Right panel: Selected columns
+        // Right panel: Selected columns with order buttons
         h += '<div class="transfer-panel">';
         h += '<div class="transfer-header">';
         h += '<span class="transfer-title">已选列 (' + _selectedList.length + ')</span>';
@@ -124,9 +129,20 @@
         } else {
             _selectedList.forEach(function(f, idx) {
                 var fixedTag = f.systemFixed ? '<span class="cfg-tag tag-fixed">固定</span>' : '';
+                var isFixed = f.systemFixed;
+                var canMoveUp = idx > 0 && !(_selectedList[idx-1] && _selectedList[idx-1].systemFixed && !isFixed);
+                var canMoveDown = idx < _selectedList.length - 1;
+                // Check if previous item is fixed (cannot move up past fixed items)
+                if (idx > 0 && _selectedList[idx-1] && _selectedList[idx-1].systemFixed) {
+                    canMoveUp = false;
+                }
                 h += '<div class="transfer-item-selected" draggable="true" data-idx="' + f._idx + '" data-order="' + idx + '">';
                 h += '<span class="drag-handle" title="拖拽排序">☰</span>';
-                h += '<label class="transfer-item-inner"><input type="checkbox" class="sel-cb" data-idx="' + f._idx + '" checked><span>' + f.name + '</span></label>';
+                h += '<label class="transfer-item-inner"><input type="checkbox" class="sel-cb" data-idx="' + f._idx + '" checked><span class="transfer-item-name">' + f.name + '</span></label>';
+                h += '<div class="order-btns">';
+                h += '<button class="order-btn" onclick="ColumnConfigTransfer.moveUp(' + idx + ')" title="上移"' + (idx === 0 ? ' disabled' : '') + '>&#9650;</button>';
+                h += '<button class="order-btn" onclick="ColumnConfigTransfer.moveDown(' + idx + ')" title="下移"' + (idx === _selectedList.length - 1 ? ' disabled' : '') + '>&#9660;</button>';
+                h += '</div>';
                 h += fixedTag;
                 h += '</div>';
             });
@@ -145,6 +161,26 @@
         h += '</div></div>';
 
         return h;
+    }
+
+    // Move up/down functions
+    function moveUp(idx) {
+        if (idx <= 0) return;
+        if (_selectedList[idx-1] && _selectedList[idx-1].systemFixed) return;
+        var tmp = _selectedList[idx];
+        _selectedList[idx] = _selectedList[idx-1];
+        _selectedList[idx-1] = tmp;
+        updateFieldDefsOrder();
+        render();
+    }
+
+    function moveDown(idx) {
+        if (idx >= _selectedList.length - 1) return;
+        var tmp = _selectedList[idx];
+        _selectedList[idx] = _selectedList[idx+1];
+        _selectedList[idx+1] = tmp;
+        updateFieldDefsOrder();
+        render();
     }
 
     // Initialize drag and drop events
@@ -200,7 +236,6 @@
         
         if (this === _draggedItem) return;
         
-        var draggedIdx = parseInt(_draggedItem.dataset.idx);
         var targetOrder = parseInt(this.dataset.order);
         var draggedOrder = parseInt(_draggedItem.dataset.order);
 
@@ -217,13 +252,11 @@
     }
 
     function updateFieldDefsOrder() {
-        // Create ordered list of field definitions
         var newOrder = [];
         _selectedList.forEach(function(item) {
             newOrder.push(_fieldDefs[item._idx]);
         });
 
-        // Update visible flags based on new order
         _fieldDefs.forEach(function(f) {
             f.visible = false;
         });
@@ -231,7 +264,6 @@
             f.visible = true;
         });
 
-        // Sort fieldDefs to match new order
         var visibleFields = newOrder.filter(function(f) { return f.visible; });
         var hiddenFields = _fieldDefs.filter(function(f) { return !f.visible; });
         _fieldDefs = visibleFields.concat(hiddenFields);
@@ -262,23 +294,18 @@
         for (var i = cbs.length - 1; i >= 0; i--) {
             (function(cb) {
                 var idx = parseInt(cb.dataset.idx);
-                var found = false;
                 for (var j = 0; j < _availableList.length; j++) {
                     if (_availableList[j]._idx === idx) {
                         _selectedList.push(_availableList[j]);
                         _availableList.splice(j, 1);
                         _fieldDefs[idx].visible = true;
-                        found = true;
                         moved = true;
                         break;
                     }
                 }
             })(cbs[i]);
         }
-        if (moved) {
-            updateFieldDefsOrder();
-            render();
-        }
+        if (moved) { updateFieldDefsOrder(); render(); }
     }
 
     function moveToRightAll() {
@@ -309,10 +336,7 @@
                 }
             })(cbs[i]);
         }
-        if (moved) {
-            updateFieldDefsOrder();
-            render();
-        }
+        if (moved) { updateFieldDefsOrder(); render(); }
     }
 
     function moveToLeftAll() {
@@ -369,7 +393,7 @@
         var msgEl = t.querySelector('.toast-message');
         var iconEl = t.querySelector('.toast-icon');
         if (msgEl) msgEl.textContent = m;
-        if (iconEl) iconEl.textContent = '✓';
+        if (iconEl) iconEl.textContent = '\u2713';
         t.className = 'toast success show';
         setTimeout(function(){ t.classList.remove('show'); }, 2500);
     }
@@ -387,6 +411,8 @@
         moveToRightAll: moveToRightAll,
         moveToLeft: moveToLeft,
         moveToLeftAll: moveToLeftAll,
+        moveUp: moveUp,
+        moveDown: moveDown,
         doApply: doApply,
         doReset: doReset,
         doSave: doSave

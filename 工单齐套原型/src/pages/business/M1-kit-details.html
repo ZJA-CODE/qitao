@@ -199,6 +199,7 @@
                     <button class="stat-tool-btn" onclick="openColumnConfig()" title="自定义列">⚙</button>
                     <button class="btn btn-sm" onclick="showToast('列宽已重置','success')">重置列宽</button>
                     <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
+                    <button class="btn btn-sm btn-primary" onclick="runKitCalculation()">运行齐套</button>
                 </div>
         </div>
         <div class="table-container">
@@ -566,6 +567,7 @@
         }
 
         function runKit() { showToast('齐套计算已启动...', 'success'); }
+        function runKitCalculation() { showToast('齐套计算已启动，正在处理中...', 'success'); }
         function saveData() { showToast('数据已保存', 'success'); }
         function exportData() {
             var vf = currentColumnConfig.filter(function(c){ return c.visible && c.field !== 'operations'; });
