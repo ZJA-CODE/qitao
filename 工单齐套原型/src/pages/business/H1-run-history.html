@@ -19,33 +19,29 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); overflow: hidden; }
-        .app-header { height: 48px; background: var(--header-bg); display: flex; align-items: center; padding: 0 20px; color: white; flex-shrink: 0; }
-        .app-logo { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .app-logo-icon { width: 28px; height: 28px; background: var(--primary); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .app-nav { display: flex; gap: 4px; margin-left: 32px; }
-        .app-nav a { color: rgba(255,255,255,0.65); text-decoration: none; font-size: 13px; padding: 8px 16px; border-bottom: 2px solid transparent; transition: all 0.2s; }
-        .app-nav a:hover { color: white; }
-        .app-nav a.active { color: white; border-bottom-color: var(--primary); }
+        .app-header { height: 48px; background: linear-gradient(135deg, #4285f4, #667eea); border-bottom: none; display: flex; align-items: center; padding: 0 20px; flex-shrink: 0; }
+        .app-title { font-size: 17px; font-weight: 600; color: #fff; letter-spacing: 1px; padding: 0; border-radius: 0; background: transparent; text-shadow: none; }
+        .tab-bar { display: flex; align-items: center; gap: 4px; margin-left: 16px; overflow-x: auto; flex: 1; padding: 4px 0; }
+        .tab-bar::-webkit-scrollbar { height: 0; }
+        .tab-item { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; font-size: 12px; cursor: pointer; white-space: nowrap; transition: all 0.2s; background: rgba(66, 133, 244, 0.08); color: #888; border: 1px solid transparent; }
+        .tab-item:hover { background: rgba(66, 133, 244, 0.15); color: #4285f4; }
+        .tab-item.active { background: #4285f4; color: #fff; border-color: #4285f4; }
+        .tab-close { width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; line-height: 1; opacity: 0.6; transition: all 0.15s; }
+        .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.15); }
+        .tab-item.active .tab-close { opacity: 0.8; }
+        .tab-item.active .tab-close:hover { opacity: 1; background: rgba(255,255,255,0.2); }
         .page-container { height: calc(100vh - 48px); display: flex; flex-direction: column; overflow: hidden; }
-        .breadcrumb-bar { height: 40px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 13px; flex-shrink: 0; }
-        .breadcrumb-bar a { color: var(--primary); text-decoration: none; }
-        .breadcrumb-bar a:hover { text-decoration: underline; }
-        .breadcrumb-sep { color: var(--text-muted); }
-        .breadcrumb-current { color: var(--text); font-weight: 500; }
-        .page-toolbar { height: 48px; padding: 0 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        .toolbar-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .toolbar-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
-        .toolbar-actions { display: flex; gap: 8px; margin-left: auto; }
-        .query-bar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; flex-shrink: 0; }
-        .query-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
-        .query-item input, .query-item select { height: 30px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 8px; font-size: 13px; color: var(--text); background: var(--bg-white); transition: border-color 0.2s; }
-        .query-item input:focus, .query-item select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-        .query-label { color: var(--text-secondary); white-space: nowrap; }
-        .stat-cards { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-        .stat-cards .stat-tools { display: flex; gap: 8px; margin-left: auto; align-items: center; }
-        .stat-action-btns { display: flex; gap: 8px; padding-left: 10px; border-left: 1px solid var(--border); }
-        .stat-tool-btn { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-white); cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; }
-        .stat-tool-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .toolbar-page-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .toolbar-page-title::before { content: ''; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
+        .unified-toolbar { padding: 10px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .toolbar-actions { display: flex; gap: 6px; margin-left: auto; }
+        .toolbar-query { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--bg); border-radius: var(--radius); margin-top: 8px; width: 100%; flex-wrap: wrap; }
+        .toolbar-query .query-item { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+        .toolbar-query .query-item input,
+        .toolbar-query .query-item select { height: 28px; min-width: 110px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 6px; font-size: 12px; }
+        .toolbar-query .query-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+        .stat-bar { padding: 8px 20px; background: var(--bg-white); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-shrink: 0; font-size: 12px; color: var(--text-muted); }
         .btn { padding: 6px 16px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--text); height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
         .btn:hover { border-color: var(--primary); color: var(--primary); }
         .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
@@ -60,63 +56,49 @@
         .data-table tbody tr:hover td { background: var(--table-hover); }
         .col-check { width: 40px; text-align: center; position: sticky; left: 0; z-index: 6; background: var(--table-header); }
         .data-table thead th.col-check { z-index: 14; }
-        .col-check input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
-        .col-left-sticky { position: sticky; left: 40px; z-index: 6; min-width: 140px; background: rgba(255,255,255,0.95); }
-        .data-table thead th.col-left-sticky { z-index: 13; background: var(--table-header); }
-        .col-right-sticky { position: sticky; right: 0; z-index: 7; min-width: 140px; border-left: 1px solid var(--border); background: rgba(255,255,255,0.95); }
-        .data-table thead th.col-right-sticky { z-index: 14; background: var(--table-header); border-left: 1px solid var(--border); }
         .th-sort { cursor: pointer; user-select: none; }
         .th-sort:hover { background: var(--primary-bg); }
         .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.4; }
         .th-sort.asc .sort-icon, .th-sort.desc .sort-icon { opacity: 1; color: var(--primary); }
         .link { color: var(--primary); cursor: pointer; text-decoration: none; font-weight: 500; }
         .link:hover { text-decoration: underline; }
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; }
-        .badge-success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
-        .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
         .table-footer { height: 40px; padding: 0 16px; background: var(--bg-white); border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; font-size: 12px; flex-shrink: 0; color: var(--text-secondary); }
         .pagination { display: flex; align-items: center; gap: 8px; }
         .page-info { padding: 0 8px; }
         .toast { position: fixed; top: 64px; right: 20px; padding: 10px 16px; background: var(--bg-white); border-radius: var(--radius); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 8px; z-index: 2000; font-size: 13px; transform: translateX(120%); transition: transform 0.25s ease; }
         .toast.show { transform: translateX(0); }
         .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
         .toast-icon { font-size: 16px; }
         .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
     </style>
 </head>
 <body>
-    <div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-message"></span></div>
+    <div class="toast" id="toast"><span class="toast-icon">✓</span><span class="toast-message"></span></div>
     <header class="app-header">
-        <div class="app-logo"><div class="app-logo-icon">📦</div>工单齐套管理系统</div>
-        <nav class="app-nav">
-            <a href="../../index.html">首页</a>
-            <a href="index.html" class="active">业务查询</a>
-            <a href="../config/index.html">配置管理</a>
-            <a href="../supply/index.html">供给信息</a>
-        </nav>
+        <div class="app-title">工单齐套管理系统</div>
+        <div class="tab-bar"></div>
     </header>
     <div class="page-container">
-        <div class="breadcrumb-bar">
-            <a href="../../index.html">🏠 首页</a><span class="breadcrumb-sep">/</span>
-            <a href="index.html">业务查询</a><span class="breadcrumb-sep">/</span>
-            <span class="breadcrumb-current">H1 齐套明细运行历史记录表</span>
-        </div>
-        <div class="page-toolbar">
-            <span class="toolbar-title">H1 齐套明细运行历史记录表</span>
-            <div class="toolbar-actions">
-                <button class="btn" onclick="exportData()">📥 导出</button>
+        <div class="unified-toolbar">
+            <div class="toolbar-row">
+                <span class="toolbar-page-title">H1 齐套明细运行历史记录表</span>
+                <div class="toolbar-actions">
+                    <button class="btn btn-sm btn-primary" onclick="exportData()">导出</button>
+                </div>
+            </div>
+            <div class="toolbar-query">
+                <div class="query-item"><span class="query-label">配置编码</span><input type="text" id="q_configCode" placeholder="多条件逗号分隔"></div>
+                <button class="btn btn-primary btn-sm" onclick="doSearch()">查询</button>
+                <button class="btn btn-sm" onclick="resetQuery()">重置</button>
             </div>
         </div>
-        <div class="query-bar">
-            <div class="query-item"><span class="query-label">配置编码</span><input type="text" id="q_configCode" placeholder="多条件逗号分隔"></div>
-            <div class="query-item"><span class="query-label">运行时间</span><input type="date" id="q_runTime"></div>
-            <div class="query-item"><span class="query-label">最后运行人</span><input type="text" id="q_lastRunBy" placeholder="输入查询"></div>
-            <button class="btn btn-primary btn-sm" onclick="doSearch()">🔍 查询</button>
-            <button class="btn btn-sm" onclick="resetQuery()">↺ 重置</button>
+        <div class="stat-bar">
+            <span>💡 提示：配置编码点击可跳转到对应版本的齐套明细数据(M1屏幕)</span>
         </div>
         <div class="table-container">
             <div class="table-wrapper">
@@ -136,18 +118,16 @@
         </div>
     </div>
 
-
+    <script src="../../js/tab-manager.js"></script>
     <script>
-        // SPEC.md 屏幕10: H1 - 齐套明细运行历史记录表 - 5个字段
-        var fieldDefs = [
-            {field:'seqNo',name:'序号',visible:true,systemFixed:true},
-            {field:'configCode',name:'配置编码',visible:true,leftSticky:true,isLink:true},
+        var tableFields = [
+            {field:'seqNo',name:'序号',visible:true},
+            {field:'configCode',name:'配置编码',visible:true},
             {field:'runTime',name:'运行时间',visible:true},
             {field:'lastRunBy',name:'最后运行人',visible:true},
-            {field:'version',name:'齐套版本',visible:true,rightSticky:true}
+            {field:'version',name:'齐套版本',visible:true}
         ];
-
-        var currentColumnConfig = fieldDefs.map(function(f){return Object.assign({},f);});
+        var currentColumnConfig = tableFields.map(function(f){return Object.assign({},f);});
         var allData, filteredData, currentPage, pageSize;
         var sortField = '', sortDir = '';
 
@@ -159,33 +139,26 @@
         }
 
         function generateSampleData() {
-            var users = ['张三','李四','王五','赵六','孙七'];
-            var configs = ['CFG-2025-00001','CFG-2025-00002','CFG-2025-00003'];
+            var users = ['张三','李四','王五','赵六','系统管理员'];
+            var configs = ['QC202606001','QC202606002','QC202606003','QC202606004','QC202606005'];
             allData = [];
-            for (var i = 1; i <= 30; i++) {
-                var rt = new Date(2025, Math.floor(Math.random()*6), Math.floor(Math.random()*28)+1);
+            for (var i = 1; i <= 40; i++) {
+                var now = new Date();
+                var runDate = new Date(now.getFullYear(), now.getMonth(), Math.floor(Math.random()*28)+1, Math.floor(Math.random()*24), Math.floor(Math.random()*60));
+                var config = configs[Math.floor(Math.random()*configs.length)];
+                // Multiple runs for same config
+                if (i > 5) {
+                    var baseIndex = Math.floor((i-1) / 3);
+                    config = configs[baseIndex % configs.length];
+                }
                 allData.push({
                     seqNo: i,
-                    configCode: configs[Math.floor(Math.random()*configs.length)],
-                    runTime: rt.toISOString().split('T')[0] + ' ' + String(Math.floor(Math.random()*24)).padStart(2,'0') + ':' + String(Math.floor(Math.random()*60)).padStart(2,'0'),
+                    configCode: config,
+                    runTime: runDate.toISOString().replace('T',' ').substring(0,19),
                     lastRunBy: users[Math.floor(Math.random()*users.length)],
-                    version: i
+                    version: Math.floor(i/3) + 1
                 });
             }
-        }
-
-        function buildHeaderHtml() {
-            var h = '<tr><th class="col-check"><input type="checkbox" onchange="toggleAll(this)"></th>';
-            currentColumnConfig.forEach(function(c) {
-                if (!c.visible) return;
-                var cls = '';
-                if (c.leftSticky) cls = 'col-left-sticky';
-                else if (c.rightSticky) cls = 'col-right-sticky';
-                var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
-                var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
-                h += '<th class="'+cls+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
-            });
-            return h + '</tr>';
         }
 
         function sortBy(field) {
@@ -208,22 +181,29 @@
             currentPage = 1; renderTable();
         }
 
+        function buildHeaderHtml() {
+            var h = '<tr>';
+            currentColumnConfig.forEach(function(c) {
+                if (!c.visible) return;
+                var sortCls = sortField === c.field ? (' th-sort ' + sortDir) : ' th-sort';
+                var icon = sortField === c.field ? (sortDir === 'asc' ? '▲' : '▼') : '▲';
+                h += '<th class="'+sortCls+'" onclick="sortBy(\''+c.field+'\')">'+c.name+'<span class="sort-icon">'+icon+'</span></th>';
+            });
+            return h + '</tr>';
+        }
+
         function buildBodyHtml() {
             var s = (currentPage-1)*pageSize, e = Math.min(s+pageSize, filteredData.length);
             var h = '';
             for (var i = s; i < e; i++) {
                 var d = filteredData[i];
-                h += '<tr data-idx="'+i+'"><td class="col-check"><input type="checkbox"></td>';
+                h += '<tr>';
                 currentColumnConfig.forEach(function(c) {
-                    if (!c.visible) return;
-                    var tc = '';
-                    if (c.leftSticky) tc = 'col-left-sticky';
-                    else if (c.rightSticky) tc = 'col-right-sticky';
                     var v = d[c.field];
-                    if (c.isLink) {
-                        h += '<td class="'+tc+'"><a class="link" onclick="goToM1(\''+d.configCode+'\')">'+(v||'')+'</a></td>';
+                    if (c.field === 'configCode') {
+                        h += '<td><a class="link" onclick="goToM1(\''+v+'\')">'+(v||'-')+'</a></td>';
                     } else {
-                        h += '<td class="'+tc+'">'+(v!==undefined?v:'')+'</td>';
+                        h += '<td>'+(v!==undefined && v!==null && v!==''?v:'-')+'</td>';
                     }
                 });
                 h += '</tr>';
@@ -239,80 +219,63 @@
             document.getElementById('currentPage').textContent = currentPage;
         }
 
-        function showToast(m) {
-            var t = document.getElementById('toast');
-            t.querySelector('.toast-message').textContent = m;
-            t.querySelector('.toast-icon').textContent = '✓';
-            t.className = 'toast success show';
-            setTimeout(function(){ t.classList.remove('show'); }, 2500);
-        }
-
-        function goToM1(configCode) {
-            window.location.href = 'M1-kit-details.html?configCode=' + encodeURIComponent(configCode);
-        }
-
         function doSearch() {
             var cc = document.getElementById('q_configCode').value.trim();
-            var rt = document.getElementById('q_runTime').value;
-            var lb = document.getElementById('q_lastRunBy').value.trim();
             filteredData = allData.filter(function(d) {
                 if (cc && d.configCode.indexOf(cc) === -1) return false;
-                if (rt && d.runTime.indexOf(rt) === -1) return false;
-                if (lb && d.lastRunBy.indexOf(lb) === -1) return false;
                 return true;
             });
             currentPage = 1; renderTable();
-            showToast('查询完成，共 ' + filteredData.length + ' 条记录');
+            showToast('查询完成，共 ' + filteredData.length + ' 条记录', 'success');
         }
 
         function resetQuery() {
             document.getElementById('q_configCode').value = '';
-            document.getElementById('q_runTime').value = '';
-            document.getElementById('q_lastRunBy').value = '';
             filteredData = allData.slice(); currentPage = 1; renderTable();
-            showToast('查询条件已重置');
-        }
-
-        function exportData() {
-            var vf = currentColumnConfig.filter(function(c){ return c.visible; });
-            var h = vf.map(function(c){ return c.name; }).join('\t') + '\n';
-            var csv = '\ufeff' + h;
-            filteredData.forEach(function(d) {
-                csv += vf.map(function(c) {
-                    var v = d[c.field];
-                    return v !== undefined && v !== null ? v : '';
-                }).join('\t') + '\n';
-            });
-            var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-            var a = document.createElement('a'); a.href = URL.createObjectURL(b);
-            a.download = '齐套运行历史_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
-            showToast('导出成功');
+            showToast('查询条件已重置', 'success');
         }
 
         function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderTable(); }
         function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
         function nextPage() { if (currentPage < Math.ceil(filteredData.length/pageSize)) { currentPage++; renderTable(); } }
-        function toggleAll(cb) { document.querySelectorAll('#tableBody input[type="checkbox"]').forEach(function(c){ c.checked = cb.checked; }); }
 
+        function exportData() {
+            var vf = currentColumnConfig.filter(function(c){ return c.visible; });
+            var csv = '\ufeff' + vf.map(function(c){ return c.name; }).join('\t') + '\n';
+            filteredData.forEach(function(d) { csv += vf.map(function(c) { var v = d[c.field]; return v !== undefined && v !== null ? v : ''; }).join('\t') + '\n'; });
+            var b = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            var a = document.createElement('a'); a.href = URL.createObjectURL(b);
+            a.download = '齐套明细运行历史记录_' + new Date().toISOString().split('T')[0] + '.csv'; a.click();
+            showToast('导出成功', 'success');
+        }
+
+        function goToM1(configCode) {
+            window.open('M1-kit-details.html?configCode=' + encodeURIComponent(configCode), '_blank');
+        }
+
+        function showToast(m, tp) {
+            var t = document.getElementById('toast');
+            t.querySelector('.toast-message').textContent = m;
+            t.className = 'toast ' + (tp || 'success') + ' show';
+            setTimeout(function(){ t.classList.remove('show'); }, 2500);
+        }
 
         init();
+
+        // 页签导航配置
+        var TAB_NAV_CONFIG = {
+            '首页': { url: '../index.html' },
+            '工单齐套明细': { url: 'M1-kit-details.html' },
+            '工单组件信息': { url: 'M2-wo-details.html' },
+            '物料缺料明细': { url: 'M3-material-details.html' },
+            '齐套明细运行历史': { url: 'H1-run-history.html' },
+            '齐套规则配置': { url: '../config/C1-config-rules.html' },
+            '工单优先级维护': { url: '../config/C2-priority.html' },
+            '组件责任方配置': { url: '../config/C3-responsible-party.html' },
+            '供给PO信息': { url: '../supply/T1-po-report.html' },
+            '供给PR信息': { url: '../supply/T2-pr-info.html' },
+        };
+        TabManager.init(TAB_NAV_CONFIG);
     </script>
-    <style>
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 1000; }
-        .modal-overlay.show { display: block; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--bg-white); border-radius: 8px; box-shadow: var(--shadow-lg); z-index: 1001; max-height: 85vh; flex-direction: column; overflow: hidden; }
-        .modal.show { display: flex; }
-        .modal-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
-        .modal-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
-        .modal-close { width: 28px; height: 28px; border: none; background: transparent; font-size: 20px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; }
-        .modal-close:hover { background: var(--border-light); color: var(--text); }
-        .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
-        .modal-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--bg); }
-        .footer-actions { display: flex; gap: 8px; }
-        .column-list { display: flex; flex-direction: column; gap: 2px; max-height: 400px; overflow-y: auto; }
-        .column-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; font-size: 13px; border-radius: var(--radius-sm); transition: background 0.15s; }
-        .column-item:hover { background: var(--bg); }
-        .column-item input { width: 16px; height: 16px; accent-color: var(--primary); }
-    </style>
 </body>
 </html>
